@@ -107,6 +107,7 @@ export function DebugPanel() {
   );
 }
 
+
 const primaryBtn = {
   background: "var(--teal)",
   color: "#07090F",
@@ -115,6 +116,7 @@ const primaryBtn = {
   padding: "6px 10px",
   fontSize: 11,
   fontWeight: 600,
+  cursor: "pointer",
 } as const;
 
 const secondaryBtn = {
@@ -124,6 +126,7 @@ const secondaryBtn = {
   borderRadius: 6,
   padding: "6px 10px",
   fontSize: 11,
+  cursor: "pointer",
 } as const;
 
 const chipBtn = {
@@ -135,6 +138,7 @@ const chipBtn = {
   padding: "4px 6px",
   fontSize: 10,
   textTransform: "capitalize" as const,
+  cursor: "pointer",
 };
 
 const label = {
@@ -154,4 +158,5 @@ const selectStyle = {
   padding: "6px 8px",
   fontSize: 11,
   fontFamily: "DM Sans, sans-serif",
+  cursor: "pointer",
 };
