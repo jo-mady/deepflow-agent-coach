@@ -1,13 +1,7 @@
-export type AgentStatus = "running" | "done" | "blocked" | "warn" | "error";
+import type { SSEEvent } from "@/types";
 
-export interface SSEEvent {
-  session_id: string;
-  agent: string;
-  status: AgentStatus;
-  message: string;
-  payload: Record<string, unknown>;
-  timestamp: string;
-}
+export type { SSEEvent } from "@/types";
+export type AgentStatus = SSEEvent["status"];
 
 export const employeeMockEvents: SSEEvent[] = [
   {
