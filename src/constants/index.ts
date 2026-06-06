@@ -172,3 +172,16 @@ export const DEFAULT_PROFILE: StudentProfile = {
 
 export const colorForAgent = (name: string): string =>
   AGENT_COLORS[name as AgentName] ?? "var(--text2)";
+
+/* ============================== AGENT DISPLAY LABELS ============================== */
+/** Shortened labels used in the trace panel (e.g. "Engagement" instead of "EngagementAgent"). */
+export const AGENT_DISPLAY_LABEL: Record<AgentName, string> = {
+  EmployeeOrchestrator: "Orchestrator",
+  EngagementAgent: "Engagement",
+  PathCuratorAgent: "PathCurator",
+  StudyPlanGenerator: "StudyPlan",
+  AssessmentAgent: "Assessment",
+  CriticSafetyAgent: "CriticSafety",
+  ManagerOrchestrator: "Orchestrator",
+  ManagerInsightsAgent: "MgrInsights",
+};
