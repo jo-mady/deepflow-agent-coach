@@ -2,6 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, type CSSProperties } from "react";
 import { DeepFlowLayout } from "@/components/deepflow/DeepFlowLayout";
 import { AgentNode, Connector } from "@/components/deepflow/AgentNode";
+import {
+  MANAGER_MOCK_STATS,
+  MANAGER_MOCK_TEAM,
+  MANAGER_MOCK_TRACE,
+} from "@/data/mockData";
+import { AGENT_DISPLAY_LABEL, READINESS_THRESHOLDS } from "@/constants";
+import type { TeamMember } from "@/types";
 
 export const Route = createFileRoute("/manager")({
   head: () => ({
