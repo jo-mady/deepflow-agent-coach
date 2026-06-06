@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/Badge";
+import { Tag } from "@/components/ui/Tag";
 import { MonoText } from "@/components/ui/MonoText";
 import { SESSION_TYPE_STYLES } from "@/constants";
 import type { SessionType } from "@/types";
@@ -40,7 +40,7 @@ export function SessionRow({
         {day}
       </MonoText>
       <span style={{ flex: 1, fontSize: 11, color: "var(--text2)" }}>{topic}</span>
-      <Badge label={sessionType} color={style.text} bg={style.bg} />
+      <Tag label={sessionType} color={style.text} bg={style.bg} />
       <MonoText color={accent}>{`${durationMinutes}m`}</MonoText>
     </div>
   );
