@@ -1,12 +1,26 @@
 import { Link } from "@tanstack/react-router";
+import { ALL_PHASES, useAgentStore, type Phase } from "@/lib/deepflow/agentStore";
 
 export type PhaseState = "done" | "active" | "default";
-export interface Phase {
-  label: string;
-  state: PhaseState;
+
+const LABELS: Record<Phase, string> = {
+  profile: "Profile",
+  curate: "Curate",
+  plan: "Plan",
+  confirm: "Confirm",
+  assess: "Assess",
+};
+
+function deriveState(phase: Phase, current: Phase): PhaseState {
+  const idx = ALL_PHASES.indexOf(phase);
+  const curIdx = ALL_PHASES.indexOf(current);
+  if (idx < curIdx) return "done";
+  if (idx === curIdx) return "active";
+  return "default";
 }
 
-export function PhaseTrack({ phases }: { phases: Phase[] }) {
+export function PhaseTrack() {
+  const { currentPhase } = useAgentStore();
   return (
     <div
       style={{
@@ -16,21 +30,22 @@ export function PhaseTrack({ phases }: { phases: Phase[] }) {
         gap: 4,
       }}
     >
-      {phases.map((p) => {
+      {ALL_PHASES.map((p) => {
+        const state = deriveState(p, currentPhase);
         const color =
-          p.state === "done" ? "var(--done)" : p.state === "active" ? "var(--teal)" : "var(--text3)";
+          state === "done" ? "var(--done)" : state === "active" ? "var(--teal)" : "var(--text3)";
         const barColor =
-          p.state === "done" ? "var(--done)" : p.state === "active" ? "var(--teal)" : "var(--border2)";
+          state === "done" ? "var(--done)" : state === "active" ? "var(--teal)" : "var(--border2)";
         const inner = (
           <>
-            <div style={{ fontSize: 9, fontWeight: 500, color, paddingBottom: 6 }}>{p.label}</div>
+            <div style={{ fontSize: 9, fontWeight: 500, color, paddingBottom: 6 }}>{LABELS[p]}</div>
             <div style={{ height: 2, background: barColor, borderRadius: 1 }} />
           </>
         );
-        if (p.label === "Assess") {
+        if (p === "assess") {
           return (
             <Link
-              key={p.label}
+              key={p}
               to="/assessment"
               style={{ flex: 1, textAlign: "center", textDecoration: "none", cursor: "pointer" }}
               title="Open assessment view"
@@ -40,7 +55,7 @@ export function PhaseTrack({ phases }: { phases: Phase[] }) {
           );
         }
         return (
-          <div key={p.label} style={{ flex: 1, textAlign: "center" }}>
+          <div key={p} style={{ flex: 1, textAlign: "center" }}>
             {inner}
           </div>
         );

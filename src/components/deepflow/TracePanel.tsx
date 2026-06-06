@@ -1,22 +1,15 @@
-import type { SSEEvent } from "@/lib/deepflow/mockEvents";
-
-const agentColors: Record<string, string> = {
-  EmployeeOrchestrator: "var(--purple)",
-  Orchestrator: "var(--purple)",
-  EngagementAgent: "var(--amber)",
-  Engagement: "var(--amber)",
-  CriticSafetyAgent: "var(--done)",
-  CriticSafety: "var(--done)",
-  PathCuratorAgent: "var(--teal)",
-  PathCurator: "var(--teal)",
-  StudyPlanGenerator: "var(--teal)",
-  StudyPlan: "var(--teal)",
-};
+import { useAgentStore } from "@/lib/deepflow/agentStore";
 
 const shortName = (a: string) =>
-  a.replace(/Agent$/, "").replace("EmployeeOrchestrator", "Orchestrator").replace("StudyPlanGenerator", "StudyPlan");
+  a
+    .replace("EmployeeOrchestrator", "Orchestrator")
+    .replace("ManagerOrchestrator", "Orchestrator")
+    .replace("ManagerInsightsAgent", "MgrInsights")
+    .replace("StudyPlanGenerator", "StudyPlan")
+    .replace(/Agent$/, "");
 
-export function TracePanel({ events }: { events: SSEEvent[] }) {
+export function TracePanel() {
+  const { traceEntries } = useAgentStore();
   return (
     <section
       style={{
@@ -58,11 +51,9 @@ export function TracePanel({ events }: { events: SSEEvent[] }) {
         </span>
       </div>
       <div style={{ overflowY: "auto", padding: "12px 20px" }}>
-        {events.map((e, i) => {
-          const isLast = i === events.length - 1;
-          const isActive = isLast && e.status === "running";
-          const name = shortName(e.agent);
-          const color = agentColors[name] ?? agentColors[e.agent] ?? "var(--text2)";
+        {traceEntries.map((e, i) => {
+          const isLast = i === traceEntries.length - 1;
+          const active = e.isActive && isLast;
           return (
             <div
               key={i}
@@ -82,27 +73,27 @@ export function TracePanel({ events }: { events: SSEEvent[] }) {
                   color: "var(--text3)",
                 }}
               >
-                {e.timestamp}
+                {e.time}
               </div>
               <div
                 style={{
                   fontFamily: "JetBrains Mono, monospace",
                   fontSize: 11,
                   fontWeight: 500,
-                  color,
+                  color: e.agentColor,
                 }}
               >
-                {name}
+                {shortName(e.agent)}
               </div>
               <div
                 style={{
                   fontSize: 12,
-                  color: isActive ? "var(--text)" : "var(--text2)",
+                  color: active ? "var(--text)" : "var(--text2)",
                   lineHeight: 1.5,
                 }}
               >
                 {e.message}
-                {isActive && <span className="df-cursor" />}
+                {active && <span className="df-cursor" />}
               </div>
             </div>
           );
