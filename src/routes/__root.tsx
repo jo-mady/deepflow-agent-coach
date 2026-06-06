@@ -11,7 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { AgentProvider } from "@/lib/deepflow/agentStore";
+import { AgentProvider } from "../lib/deepflow/agentStore";
 
 
 function NotFoundComponent() {
