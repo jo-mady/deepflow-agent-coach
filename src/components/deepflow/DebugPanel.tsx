@@ -13,7 +13,6 @@ export function DebugPanel() {
   const [open, setOpen] = useState(false);
   const { currentPhase, setPhase, stepForward, resetPipeline, loadPreset } = useAgentStore();
 
-  if (!import.meta.env.DEV) return null;
 
   return (
     <div
