@@ -3,13 +3,14 @@ export interface TagProps {
   color: string;
   bg: string;
   padding?: string;
+  borderColor?: string;
 }
 
 /**
  * Uppercase outlined pill used for risks, session types, and topic tags.
  * Named Tag to avoid case-clash with shadcn's `badge.tsx`.
  */
-export function Tag({ label, color, bg, padding = "2px 6px" }: TagProps) {
+export function Tag({ label, color, bg, padding = "2px 6px", borderColor }: TagProps) {
   return (
     <span
       style={{
@@ -20,7 +21,7 @@ export function Tag({ label, color, bg, padding = "2px 6px" }: TagProps) {
         borderRadius: 4,
         letterSpacing: "0.06em",
         border: "1px solid",
-        borderColor: color,
+        borderColor: borderColor ?? color,
         color,
         background: bg,
         display: "inline-block",

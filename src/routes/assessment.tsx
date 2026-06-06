@@ -249,7 +249,7 @@ function QuestionPanel() {
         >
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
             <MonoText size={11} color={PURPLE}>Q6</MonoText>
-            <Tag label="NSG Rules" color="var(--text3)" bg="var(--surface2)" padding="2px 8px" />
+            <Tag label="NSG Rules" color="var(--text3)" bg="var(--surface2)" borderColor="var(--border2)" padding="2px 8px" />
             <MonoText style={{ marginLeft: "auto" }}>Source: az_104_study_guide.md</MonoText>
           </div>
 
