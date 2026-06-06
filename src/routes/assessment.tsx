@@ -279,45 +279,14 @@ interface TraceLine {
   cursorColor?: string;
 }
 
-const traceLines: TraceLine[] = [
-  {
-    time: "08:52.1",
-    agent: "Engagement",
-    color: "var(--amber)",
-    message:
-      "Your Friday has just 1 meeting. Clear head, optimal for assessment. Approving assessment for today.",
-  },
-  {
-    time: "08:52.3",
-    agent: "CriticSafety",
-    color: "var(--done)",
-    message:
-      "Assessment trigger approved. No safety flags. Human confirmation gate passed.",
-  },
-  {
-    time: "08:52.8",
-    agent: "Assessment",
-    color: PURPLE,
-    message:
-      "Querying Foundry IQ for VNet topic. Retrieved 3 chunks from az_104_study_guide.md. Generating Q1.",
-  },
-  {
-    time: "08:57.2",
-    agent: "Assessment",
-    color: PURPLE,
-    message:
-      "Q3 incorrect — NSG rule limit topic. Q5 incorrect — VNet peering limits. Noting weak topics.",
-  },
-  {
-    time: "08:59.1",
-    agent: "Assessment",
-    color: PURPLE,
-    message:
-      "Generating Q6 on NSG topics. Retrieving chunks from Foundry IQ knowledge base...",
-    active: true,
-    cursorColor: PURPLE,
-  },
-];
+const traceLines: TraceLine[] = ASSESSMENT_MOCK_TRACE.map((e) => ({
+  time: e.time,
+  agent: AGENT_DISPLAY_LABEL[e.agent],
+  color: e.agentColor,
+  message: e.message,
+  active: e.isActive || undefined,
+  cursorColor: e.isActive ? e.agentColor : undefined,
+}));
 
 function TracePanel() {
   return (
