@@ -1,14 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import type { CSSProperties } from "react";
 import { DeepFlowLayout } from "@/components/deepflow/DeepFlowLayout";
 import { AgentNode, Connector } from "@/components/deepflow/AgentNode";
+import { TracePanel } from "@/components/deepflow/TracePanel";
+import { AccentActiveNode } from "@/components/deepflow/AccentActiveNode";
+import { CriticSafetyBox } from "@/components/deepflow/CriticSafetyBox";
 import {
   ASSESSMENT_MOCK_QUESTION,
   ASSESSMENT_MOCK_STATE,
   ASSESSMENT_MOCK_TRACE,
 } from "@/data/mockData";
 import { AGENT_DISPLAY_LABEL } from "@/constants";
-import type { QuestionResult } from "@/types";
+import { panelLabel } from "@/lib/styles";
+import type { QuestionResult, TraceLine } from "@/types";
 
 export const Route = createFileRoute("/assessment")({
   head: () => ({
@@ -21,6 +24,21 @@ export const Route = createFileRoute("/assessment")({
 });
 
 const PURPLE = "var(--purple)";
+
+const traceLines: TraceLine[] = ASSESSMENT_MOCK_TRACE.map((e) => ({
+  time: e.time,
+  agent: AGENT_DISPLAY_LABEL[e.agent],
+  color: e.agentColor,
+  message: e.message,
+  active: e.isActive || undefined,
+  cursorColor: e.isActive ? e.agentColor : undefined,
+}));
+
+// Map typed QuestionResult → visual dot state ("pending" → "empty").
+const questionDots: ("correct" | "wrong" | "active" | "empty")[] =
+  ASSESSMENT_MOCK_STATE.questionResults.map((r: QuestionResult) =>
+    r === "pending" ? "empty" : r,
+  );
 
 function AssessmentPage() {
   return (
@@ -36,7 +54,11 @@ function AssessmentPage() {
       >
         <Sidebar />
         <div style={{ display: "grid", gridTemplateRows: "1fr 1fr", overflow: "hidden", minHeight: 0 }}>
-          <TracePanel />
+          <TracePanel
+            entries={traceLines}
+            headerRight="ASSESSMENT MODE"
+            headerRightColor={PURPLE}
+          />
           <QuestionPanel />
         </div>
       </main>
@@ -81,11 +103,12 @@ function Sidebar() {
         />
         <Connector label="→ cognitive_load: light" />
 
-        {/* Assessment node in PURPLE (custom — AgentNode active=teal) */}
-        <PurpleActiveNode
+        <AccentActiveNode
           name="AssessmentAgent"
           subtitle="Q6 of 10 · Foundry IQ grounded · citing docs"
           meta="live"
+          accentColor={PURPLE}
+          shadowColor="#8B5CF633"
         />
         <Connector label="→ score → orchestrator" />
 
@@ -95,30 +118,7 @@ function Sidebar() {
           state="waiting"
         />
 
-        <div
-          style={{
-            marginTop: 8,
-            padding: "8px 14px",
-            border: "1px solid var(--done-dim)",
-            borderRadius: 8,
-            background: "#48BB7806",
-          }}
-        >
-          <div
-            style={{
-              fontSize: 10,
-              fontWeight: 600,
-              color: "var(--done)",
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-            }}
-          >
-            CriticSafety
-          </div>
-          <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 2 }}>
-            All 6 questions approved · 0 blocks
-          </div>
-        </div>
+        <CriticSafetyBox subtitle="All 6 questions approved · 0 blocks" />
       </div>
 
       {/* Score bar */}
@@ -192,12 +192,6 @@ function Sidebar() {
   );
 }
 
-// Map typed QuestionResult → visual dot state ("pending" → "empty").
-const questionDots: ("correct" | "wrong" | "active" | "empty")[] =
-  ASSESSMENT_MOCK_STATE.questionResults.map((r: QuestionResult) =>
-    r === "pending" ? "empty" : r,
-  );
-
 function PhaseTrackAssessment() {
   const phases = [
     { label: "Profile", state: "done" },
@@ -226,139 +220,6 @@ function PhaseTrackAssessment() {
         );
       })}
     </div>
-  );
-}
-
-function PurpleActiveNode({ name, subtitle, meta }: { name: string; subtitle: string; meta: string }) {
-  return (
-    <div
-      style={{
-        position: "relative",
-        borderRadius: 10,
-        padding: "12px 14px",
-        border: `1px solid ${PURPLE}`,
-        background: "var(--purple-dim)",
-        boxShadow: "0 0 16px #8B5CF633",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span
-          className="df-pulse"
-          style={{ width: 8, height: 8, borderRadius: "50%", background: PURPLE, display: "inline-block" }}
-        />
-        <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "-0.2px", color: PURPLE }}>{name}</span>
-      </div>
-      <div style={{ fontSize: 10, color: "var(--text3)", paddingLeft: 16, lineHeight: 1.5, marginTop: 4 }}>
-        {subtitle}
-      </div>
-      <div
-        className="df-pulse"
-        style={{
-          position: "absolute",
-          top: 12,
-          right: 14,
-          fontFamily: "JetBrains Mono, monospace",
-          fontSize: 9,
-          color: PURPLE,
-        }}
-      >
-        {meta}
-      </div>
-    </div>
-  );
-}
-
-/* ------------------------------ TRACE ------------------------------ */
-
-interface TraceLine {
-  time: string;
-  agent: string;
-  color: string;
-  message: string;
-  active?: boolean;
-  cursorColor?: string;
-}
-
-const traceLines: TraceLine[] = ASSESSMENT_MOCK_TRACE.map((e) => ({
-  time: e.time,
-  agent: AGENT_DISPLAY_LABEL[e.agent],
-  color: e.agentColor,
-  message: e.message,
-  active: e.isActive || undefined,
-  cursorColor: e.isActive ? e.agentColor : undefined,
-}));
-
-function TracePanel() {
-  return (
-    <section style={{ display: "flex", flexDirection: "column", overflow: "hidden", borderBottom: "1px solid var(--border)" }}>
-      <div
-        style={{
-          padding: "12px 20px",
-          borderBottom: "1px solid var(--border)",
-          display: "flex",
-          justifyContent: "space-between",
-        }}
-      >
-        <span style={panelLabel("var(--text3)")}>Live Reasoning Trace</span>
-        <span
-          style={{
-            fontSize: 9,
-            color: PURPLE,
-            fontFamily: "JetBrains Mono, monospace",
-            letterSpacing: "0.08em",
-          }}
-        >
-          ASSESSMENT MODE
-        </span>
-      </div>
-      <div style={{ overflowY: "auto", padding: "12px 20px" }}>
-        {traceLines.map((e, i) => {
-          const isLast = i === traceLines.length - 1;
-          return (
-            <div
-              key={i}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "70px 110px 1fr",
-                gap: 12,
-                padding: "8px 0",
-                borderBottom: isLast ? "none" : "1px solid var(--border)",
-                alignItems: "start",
-              }}
-            >
-              <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "var(--text3)" }}>
-                {e.time}
-              </div>
-              <div
-                style={{
-                  fontFamily: "JetBrains Mono, monospace",
-                  fontSize: 11,
-                  fontWeight: 500,
-                  color: e.color,
-                }}
-              >
-                {e.agent}
-              </div>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: e.active ? "var(--text)" : "var(--text2)",
-                  lineHeight: 1.5,
-                }}
-              >
-                {e.message}
-                {e.active && (
-                  <span
-                    className="df-cursor"
-                    style={{ background: e.cursorColor ?? "var(--teal)" }}
-                  />
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </section>
   );
 }
 
@@ -569,16 +430,6 @@ function BottomBar() {
     </footer>
   );
 }
-
-/* ------------------------------ utils ------------------------------ */
-
-const panelLabel = (color: string, spacing = 0.12): CSSProperties => ({
-  fontSize: 10,
-  fontWeight: 600,
-  textTransform: "uppercase",
-  letterSpacing: `${spacing}em`,
-  color,
-});
 
 // Silence unused warning if Link not used here
 void Link;
