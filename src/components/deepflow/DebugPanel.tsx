@@ -100,6 +100,7 @@ export function DebugPanel() {
           alignItems: "center",
           justifyContent: "center",
           cursor: "pointer",
+        }}
       >
         ⚙️
       </button>
