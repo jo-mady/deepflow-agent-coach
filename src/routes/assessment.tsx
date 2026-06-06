@@ -365,12 +365,11 @@ function TracePanel() {
 /* ------------------------------ QUESTION ------------------------------ */
 
 function QuestionPanel() {
-  const options = [
-    { key: "A", text: "100 rules", selected: false },
-    { key: "B", text: "200 rules", selected: true },
-    { key: "C", text: "500 rules", selected: false },
-    { key: "D", text: "1000 rules", selected: false },
-  ];
+  const options = ASSESSMENT_MOCK_QUESTION.options.map((o) => ({
+    key: o.key,
+    text: o.text,
+    selected: ASSESSMENT_MOCK_QUESTION.selectedOption === o.key,
+  }));
 
   return (
     <section style={{ background: "var(--surface)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
