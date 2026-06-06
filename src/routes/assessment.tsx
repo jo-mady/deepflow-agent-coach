@@ -2,6 +2,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import type { CSSProperties } from "react";
 import { DeepFlowLayout } from "@/components/deepflow/DeepFlowLayout";
 import { AgentNode, Connector } from "@/components/deepflow/AgentNode";
+import {
+  ASSESSMENT_MOCK_QUESTION,
+  ASSESSMENT_MOCK_STATE,
+  ASSESSMENT_MOCK_TRACE,
+} from "@/data/mockData";
+import { AGENT_DISPLAY_LABEL } from "@/constants";
+import type { QuestionResult } from "@/types";
 
 export const Route = createFileRoute("/assessment")({
   head: () => ({

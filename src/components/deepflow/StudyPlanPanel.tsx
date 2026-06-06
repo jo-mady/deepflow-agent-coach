@@ -1,37 +1,22 @@
 import type { CSSProperties } from "react";
+import { EMPLOYEE_MOCK_MILESTONES, EMPLOYEE_MOCK_SESSIONS } from "@/data/mockData";
+import type { SessionType } from "@/types";
 
-type SessionType = "deep" | "standard" | "light" | "done";
+/* Adapter: map typed mock data → local view shapes (visuals unchanged). */
+const milestones = EMPLOYEE_MOCK_MILESTONES.map((m) => ({
+  name: m.name,
+  date: m.targetDate,
+  dot: (m.status === "pending" ? "default" : m.status) as "done" | "active" | "default",
+  highlight: m.status === "active",
+}));
 
-interface Milestone {
-  name: string;
-  date: string;
-  dot: "done" | "active" | "default";
-  highlight?: boolean;
-}
-
-interface Session {
-  day: string;
-  topic: string;
-  type: SessionType;
-  duration: string;
-  today?: boolean;
-}
-
-const milestones: Milestone[] = [
-  { name: "Domain 1 · IAM & Identity", date: "Jun 14", dot: "done" },
-  { name: "Domain 2 · Networking", date: "Jun 21", dot: "active", highlight: true },
-  { name: "Domain 3 · Storage", date: "Jun 28", dot: "default" },
-  { name: "Domain 4 · Compute", date: "Jul 5", dot: "default" },
-  { name: "Domain 5 · Monitoring", date: "Jul 12", dot: "default" },
-];
-
-const sessions: Session[] = [
-  { day: "Mon", topic: "IAM — Role assignments", type: "done", duration: "45m" },
-  { day: "Tue", topic: "VNet — Fundamentals", type: "standard", duration: "30m" },
-  { day: "Wed", topic: "VNet — Peering & DNS", type: "light", duration: "15m", today: true },
-  { day: "Thu", topic: "NSG — Rules & flow logs", type: "standard", duration: "30m" },
-  { day: "Fri", topic: "NSG — Advanced scenarios", type: "deep", duration: "45m" },
-];
+const sessions = EMPLOYEE_MOCK_SESSIONS.map((s) => ({
+  day: s.day,
+  topic: s.topic,
+  type: s.sessionType,
+  duration: `${s.durationMinutes}m`,
+  today: s.isToday,
+}));
 
 const badgeStyle = (type: SessionType): CSSProperties => {
   const base: CSSProperties = {
