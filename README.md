@@ -337,4 +337,4 @@ python api/main.py
 
 ## License
 
-Built for the Microsoft Agents League Hackathon 2025. All synthetic data is fabricated for demonstration purposes.
+Built for the Microsoft Agents League Hackathon 2026. All synthetic data is fabricated for demonstration purposes.
