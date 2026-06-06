@@ -13,7 +13,6 @@ export function DebugPanel() {
   const [open, setOpen] = useState(false);
   const { currentPhase, setPhase, stepForward, resetPipeline, loadPreset } = useAgentStore();
 
-  if (!import.meta.env.DEV) return null;
 
   return (
     <div
@@ -100,6 +99,7 @@ export function DebugPanel() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          cursor: "pointer",
         }}
       >
         ⚙️
@@ -107,6 +107,7 @@ export function DebugPanel() {
     </div>
   );
 }
+
 
 const primaryBtn = {
   background: "var(--teal)",
@@ -116,6 +117,7 @@ const primaryBtn = {
   padding: "6px 10px",
   fontSize: 11,
   fontWeight: 600,
+  cursor: "pointer",
 } as const;
 
 const secondaryBtn = {
@@ -125,6 +127,7 @@ const secondaryBtn = {
   borderRadius: 6,
   padding: "6px 10px",
   fontSize: 11,
+  cursor: "pointer",
 } as const;
 
 const chipBtn = {
@@ -136,6 +139,7 @@ const chipBtn = {
   padding: "4px 6px",
   fontSize: 10,
   textTransform: "capitalize" as const,
+  cursor: "pointer",
 };
 
 const label = {
@@ -155,4 +159,5 @@ const selectStyle = {
   padding: "6px 8px",
   fontSize: 11,
   fontFamily: "DM Sans, sans-serif",
+  cursor: "pointer",
 };
