@@ -8,6 +8,9 @@ import { CriticSafetyBox } from "@/components/deepflow/CriticSafetyBox";
 import { StatCard } from "@/components/deepflow/StatCard";
 import { ReadinessBar } from "@/components/deepflow/ReadinessBar";
 import { RiskBadge } from "@/components/deepflow/RiskBadge";
+import { PanelHeader } from "@/components/ui/PanelHeader";
+import { MonoText } from "@/components/ui/MonoText";
+import { Dot } from "@/components/ui/Dot";
 import {
   MANAGER_MOCK_STATS,
   MANAGER_MOCK_TEAM,
@@ -67,8 +70,6 @@ function ManagerPage() {
   );
 }
 
-/* ------------------------------ SIDEBAR ------------------------------ */
-
 function Sidebar() {
   return (
     <aside
@@ -115,7 +116,6 @@ function Sidebar() {
 
       <div style={{ flex: 1 }} />
 
-      {/* Stats grid */}
       <div
         style={{
           margin: "0 16px 16px",
@@ -132,8 +132,6 @@ function Sidebar() {
     </aside>
   );
 }
-
-/* ------------------------------ TEAM TABLE ------------------------------ */
 
 type Tone = "high" | "mid" | "low";
 interface Member {
@@ -224,26 +222,11 @@ function TeamTablePanel() {
         overflow: "hidden",
       }}
     >
-      <div
-        style={{
-          padding: "12px 20px",
-          borderBottom: "1px solid var(--border)",
-          display: "flex",
-          justifyContent: "space-between",
-        }}
-      >
-        <span style={panelLabel("var(--text3)")}>Team Readiness — TEAM-A</span>
-        <span
-          style={{
-            fontSize: 9,
-            color: "var(--text3)",
-            fontFamily: "JetBrains Mono, monospace",
-            letterSpacing: "0.08em",
-          }}
-        >
-          READ ONLY · AGGREGATES ONLY
-        </span>
-      </div>
+      <PanelHeader
+        left="Team Readiness — TEAM-A"
+        right="READ ONLY · AGGREGATES ONLY"
+        rightMono
+      />
       <div style={{ padding: "16px 20px", overflowY: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
@@ -268,15 +251,7 @@ function TeamTablePanel() {
                     <div style={{ fontSize: 12, fontWeight: 500, color: m.nameColor ?? "var(--text)" }}>
                       {m.name}
                     </div>
-                    <div
-                      style={{
-                        fontFamily: "JetBrains Mono, monospace",
-                        fontSize: 10,
-                        color: "var(--text3)",
-                      }}
-                    >
-                      {m.id}
-                    </div>
+                    <MonoText>{m.id}</MonoText>
                   </td>
                   <td style={{ ...rowTd, color: "var(--text2)", fontSize: 11 }}>{m.role}</td>
                   <td style={rowTd}>
@@ -284,24 +259,8 @@ function TeamTablePanel() {
                   </td>
                   <td style={rowTd}>
                     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                      <span
-                        style={{
-                          width: 6,
-                          height: 6,
-                          borderRadius: "50%",
-                          background: loadColor,
-                          display: "inline-block",
-                        }}
-                      />
-                      <span
-                        style={{
-                          fontFamily: "JetBrains Mono, monospace",
-                          fontSize: 10,
-                          color: loadColor,
-                        }}
-                      >
-                        {m.loadHrs}
-                      </span>
+                      <Dot color={loadColor} />
+                      <MonoText color={loadColor}>{m.loadHrs}</MonoText>
                     </div>
                   </td>
                   <td style={rowTd}>
@@ -344,8 +303,6 @@ function TeamTablePanel() {
     </section>
   );
 }
-
-/* ------------------------------ BOTTOM BAR ------------------------------ */
 
 function BottomBar() {
   const [value, setValue] = useState("");

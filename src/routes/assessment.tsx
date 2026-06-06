@@ -4,6 +4,10 @@ import { AgentNode, Connector } from "@/components/deepflow/AgentNode";
 import { TracePanel } from "@/components/deepflow/TracePanel";
 import { AccentActiveNode } from "@/components/deepflow/AccentActiveNode";
 import { CriticSafetyBox } from "@/components/deepflow/CriticSafetyBox";
+import { CognitiveLoadCard } from "@/components/deepflow/CognitiveLoadCard";
+import { PanelHeader } from "@/components/ui/PanelHeader";
+import { MonoText } from "@/components/ui/MonoText";
+import { Tag } from "@/components/ui/Tag";
 import {
   ASSESSMENT_MOCK_QUESTION,
   ASSESSMENT_MOCK_STATE,
@@ -34,7 +38,6 @@ const traceLines: TraceLine[] = ASSESSMENT_MOCK_TRACE.map((e) => ({
   cursorColor: e.isActive ? e.agentColor : undefined,
 }));
 
-// Map typed QuestionResult → visual dot state ("pending" → "empty").
 const questionDots: ("correct" | "wrong" | "active" | "empty")[] =
   ASSESSMENT_MOCK_STATE.questionResults.map((r: QuestionResult) =>
     r === "pending" ? "empty" : r,
@@ -66,8 +69,6 @@ function AssessmentPage() {
     </DeepFlowLayout>
   );
 }
-
-/* ------------------------------ SIDEBAR ------------------------------ */
 
 function Sidebar() {
   return (
@@ -121,7 +122,6 @@ function Sidebar() {
         <CriticSafetyBox subtitle="All 6 questions approved · 0 blocks" />
       </div>
 
-      {/* Score bar */}
       <div
         style={{
           margin: "8px 16px 4px",
@@ -135,14 +135,7 @@ function Sidebar() {
           <span style={panelLabel("var(--text3)", 0.08)}>Running Score</span>
           <span style={{ fontSize: 11, fontWeight: 600, color: PURPLE }}>60%</span>
         </div>
-        <div
-          style={{
-            height: 4,
-            background: "var(--border2)",
-            borderRadius: 2,
-            overflow: "hidden",
-          }}
-        >
+        <div style={{ height: 4, background: "var(--border2)", borderRadius: 2, overflow: "hidden" }}>
           <div
             style={{
               width: "60%",
@@ -154,15 +147,7 @@ function Sidebar() {
         </div>
       </div>
 
-      {/* Question dots */}
-      <div
-        style={{
-          margin: "4px 16px 16px",
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 4,
-        }}
-      >
+      <div style={{ margin: "4px 16px 16px", display: "flex", flexWrap: "wrap", gap: 4 }}>
         {questionDots.map((d, i) => (
           <span
             key={i}
@@ -223,8 +208,6 @@ function PhaseTrackAssessment() {
   );
 }
 
-/* ------------------------------ QUESTION ------------------------------ */
-
 function QuestionPanel() {
   const options = ASSESSMENT_MOCK_QUESTION.options.map((o) => ({
     key: o.key,
@@ -234,26 +217,11 @@ function QuestionPanel() {
 
   return (
     <section style={{ background: "var(--surface)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-      <div
-        style={{
-          padding: "12px 20px",
-          borderBottom: "1px solid var(--border)",
-          display: "flex",
-          justifyContent: "space-between",
-        }}
-      >
-        <span style={panelLabel("var(--text3)")}>Question 6 of 10</span>
-        <span
-          style={{
-            fontSize: 9,
-            color: "var(--text3)",
-            fontFamily: "JetBrains Mono, monospace",
-            letterSpacing: "0.08em",
-          }}
-        >
-          75% TO PASS · CURRENTLY 60%
-        </span>
-      </div>
+      <PanelHeader
+        left="Question 6 of 10"
+        right="75% TO PASS · CURRENTLY 60%"
+        rightMono
+      />
 
       <div
         style={{
@@ -264,28 +232,13 @@ function QuestionPanel() {
           overflowY: "auto",
         }}
       >
-        {/* Cognitive load approval */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            padding: "12px 14px",
-            border: "1px solid var(--amber)",
-            borderRadius: 10,
-            background: "var(--amber-dim)",
-            color: "var(--amber)",
-            fontSize: 12,
-            lineHeight: 1.5,
-          }}
-        >
-          <span style={{ fontSize: 16 }}>🧠</span>
-          <span>
-            Your Friday schedule is clear — I've approved this assessment. You're in a good cognitive state to tackle these questions.
-          </span>
-        </div>
+        <CognitiveLoadCard
+          pressure=""
+          difficulty=""
+          recommendation=""
+          message="Your Friday schedule is clear — I've approved this assessment. You're in a good cognitive state to tackle these questions."
+        />
 
-        {/* Question card */}
         <div
           style={{
             border: `1px solid ${PURPLE}`,
@@ -295,32 +248,9 @@ function QuestionPanel() {
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-            <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: PURPLE }}>Q6</span>
-            <span
-              style={{
-                background: "var(--surface2)",
-                border: "1px solid var(--border2)",
-                borderRadius: 4,
-                padding: "2px 8px",
-                color: "var(--text3)",
-                textTransform: "uppercase",
-                fontSize: 10,
-                fontWeight: 600,
-                letterSpacing: "0.08em",
-              }}
-            >
-              NSG Rules
-            </span>
-            <span
-              style={{
-                marginLeft: "auto",
-                fontFamily: "JetBrains Mono, monospace",
-                fontSize: 10,
-                color: "var(--text3)",
-              }}
-            >
-              Source: az_104_study_guide.md
-            </span>
+            <MonoText size={11} color={PURPLE}>Q6</MonoText>
+            <Tag label="NSG Rules" color="var(--text3)" bg="var(--surface2)" padding="2px 8px" />
+            <MonoText style={{ marginLeft: "auto" }}>Source: az_104_study_guide.md</MonoText>
           </div>
 
           <div
@@ -353,16 +283,7 @@ function QuestionPanel() {
                   color: "var(--text2)",
                 }}
               >
-                <span
-                  style={{
-                    fontFamily: "JetBrains Mono, monospace",
-                    fontSize: 10,
-                    color: "var(--text3)",
-                    width: 16,
-                  }}
-                >
-                  {o.key}
-                </span>
+                <MonoText style={{ width: 16 }}>{o.key}</MonoText>
                 <span>{o.text}</span>
               </div>
             ))}
@@ -372,8 +293,6 @@ function QuestionPanel() {
     </section>
   );
 }
-
-/* ------------------------------ BOTTOM BAR ------------------------------ */
 
 function BottomBar() {
   return (
@@ -391,16 +310,9 @@ function BottomBar() {
         zIndex: 10,
       }}
     >
-      <div
-        style={{
-          flex: 1,
-          fontFamily: "JetBrains Mono, monospace",
-          fontSize: 12,
-          color: "var(--text3)",
-        }}
-      >
+      <MonoText size={12} style={{ flex: 1 }}>
         Q6 / 10 · 60% running · need 75% to pass
-      </div>
+      </MonoText>
       <button
         style={{
           background: "transparent",
@@ -431,5 +343,4 @@ function BottomBar() {
   );
 }
 
-// Silence unused warning if Link not used here
 void Link;
