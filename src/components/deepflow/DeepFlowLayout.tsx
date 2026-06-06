@@ -2,7 +2,7 @@ import { useEffect, type ReactNode } from "react";
 import { TopBar } from "@/components/deepflow/TopBar";
 import { DebugPanel } from "@/components/deepflow/DebugPanel";
 import { useVoice } from "@/hooks/useVoice";
-import { useSSE, type Persona } from "@/hooks/useSSE";
+import { useSSE, SSEConnectionProvider, type Persona } from "@/hooks/useSSE";
 
 interface DeepFlowLayoutProps {
   persona: Persona;
@@ -12,7 +12,7 @@ interface DeepFlowLayoutProps {
 
 export function DeepFlowLayout({ persona, sessionId, children }: DeepFlowLayoutProps) {
   const { voiceEnabled, toggle, speak } = useVoice();
-  const { events } = useSSE(persona, sessionId);
+  const { events, connectionState } = useSSE(persona, sessionId);
 
   useEffect(() => {
     if (!voiceEnabled) return;
@@ -20,11 +20,12 @@ export function DeepFlowLayout({ persona, sessionId, children }: DeepFlowLayoutP
   }, [events, voiceEnabled, speak, persona, sessionId]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
-      <TopBar voiceEnabled={voiceEnabled} onToggleVoice={toggle} />
-      {children}
-      <DebugPanel />
-    </div>
+    <SSEConnectionProvider state={connectionState}>
+      <div style={{ display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
+        <TopBar voiceEnabled={voiceEnabled} onToggleVoice={toggle} />
+        {children}
+        <DebugPanel />
+      </div>
+    </SSEConnectionProvider>
   );
 }
-

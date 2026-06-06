@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export function useVoice() {
-  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
   const spokenRef = useRef<Set<string>>(new Set());
 
   const toggle = useCallback(() => {
