@@ -2,13 +2,20 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, type CSSProperties } from "react";
 import { DeepFlowLayout } from "@/components/deepflow/DeepFlowLayout";
 import { AgentNode, Connector } from "@/components/deepflow/AgentNode";
+import { TracePanel } from "@/components/deepflow/TracePanel";
+import { AccentActiveNode } from "@/components/deepflow/AccentActiveNode";
+import { CriticSafetyBox } from "@/components/deepflow/CriticSafetyBox";
+import { StatCard } from "@/components/deepflow/StatCard";
+import { ReadinessBar } from "@/components/deepflow/ReadinessBar";
+import { RiskBadge } from "@/components/deepflow/RiskBadge";
 import {
   MANAGER_MOCK_STATS,
   MANAGER_MOCK_TEAM,
   MANAGER_MOCK_TRACE,
 } from "@/data/mockData";
 import { AGENT_DISPLAY_LABEL, READINESS_THRESHOLDS } from "@/constants";
-import type { TeamMember } from "@/types";
+import { panelLabel } from "@/lib/styles";
+import type { TeamMember, TraceLine } from "@/types";
 
 export const Route = createFileRoute("/manager")({
   head: () => ({
@@ -21,6 +28,21 @@ export const Route = createFileRoute("/manager")({
 });
 
 const AMBER = "var(--amber)";
+
+const insightsSteps = [
+  { status: "done", glyph: "✓", color: "var(--done)", text: "Gap analysis · 8 members" },
+  { status: "active", glyph: "→", color: AMBER, text: "Generating readiness report..." },
+  { status: "waiting", glyph: "3", color: "var(--text3)", text: "Cert suggestions" },
+] as const;
+
+const traceLines: TraceLine[] = MANAGER_MOCK_TRACE.map((e) => ({
+  time: e.time,
+  agent: AGENT_DISPLAY_LABEL[e.agent],
+  color: e.agentColor,
+  message: e.message,
+  active: e.isActive || undefined,
+  cursorColor: e.isActive ? e.agentColor : undefined,
+}));
 
 function ManagerPage() {
   return (
@@ -36,7 +58,7 @@ function ManagerPage() {
       >
         <Sidebar />
         <div style={{ display: "grid", gridTemplateRows: "1fr 1fr", overflow: "hidden", minHeight: 0 }}>
-          <TracePanel />
+          <TracePanel entries={traceLines} headerRight="MANAGER MODE" headerRightColor={AMBER} />
           <TeamTablePanel />
         </div>
       </main>
@@ -79,33 +101,16 @@ function Sidebar() {
         />
         <Connector label="→ Fabric IQ · Work IQ signals" />
 
-        <AmberInsightsNode />
+        <AccentActiveNode
+          name="ManagerInsightsAgent"
+          subtitle=""
+          meta="live"
+          accentColor={AMBER}
+          shadowColor="#F5A62333"
+          steps={[...insightsSteps]}
+        />
 
-        <div
-          style={{
-            marginTop: 8,
-            padding: "8px 14px",
-            border: "1px solid var(--done-dim)",
-            borderRadius: 8,
-            background: "#48BB7806",
-            opacity: 0.6,
-          }}
-        >
-          <div
-            style={{
-              fontSize: 10,
-              fontWeight: 600,
-              color: "var(--done)",
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-            }}
-          >
-            CriticSafety
-          </div>
-          <div style={{ fontSize: 10, color: "var(--text3)", marginTop: 2 }}>
-            All outputs approved · privacy rules enforced
-          </div>
-        </div>
+        <CriticSafetyBox subtitle="All outputs approved · privacy rules enforced" opacity={0.6} />
       </div>
 
       <div style={{ flex: 1 }} />
@@ -128,202 +133,6 @@ function Sidebar() {
   );
 }
 
-function StatCard({ value, color, label }: { value: string; color: string; label: string }) {
-  return (
-    <div
-      style={{
-        padding: "10px 12px",
-        border: "1px solid var(--border2)",
-        borderRadius: 8,
-        background: "var(--surface2)",
-      }}
-    >
-      <div
-        style={{
-          fontFamily: "Syne, sans-serif",
-          fontSize: 22,
-          fontWeight: 800,
-          lineHeight: 1,
-          marginBottom: 4,
-          color,
-        }}
-      >
-        {value}
-      </div>
-      <div style={{ fontSize: 10, color: "var(--text3)", fontWeight: 500 }}>{label}</div>
-    </div>
-  );
-}
-
-function AmberInsightsNode() {
-  const steps = [
-    { state: "done", glyph: "✓", color: "var(--done)", text: "Gap analysis · 8 members" },
-    { state: "active", glyph: "→", color: AMBER, text: "Generating readiness report..." },
-    { state: "waiting", glyph: "3", color: "var(--text3)", text: "Cert suggestions" },
-  ] as const;
-
-  return (
-    <div
-      style={{
-        position: "relative",
-        borderRadius: 10,
-        padding: "12px 14px",
-        border: `1px solid ${AMBER}`,
-        background: "var(--amber-dim)",
-        boxShadow: "0 0 16px #F5A62333",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span
-          className="df-pulse"
-          style={{ width: 8, height: 8, borderRadius: "50%", background: AMBER, display: "inline-block" }}
-        />
-        <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: "-0.2px", color: AMBER }}>
-          ManagerInsightsAgent
-        </span>
-      </div>
-
-      <div style={{ padding: "8px 0 0 16px", display: "flex", flexDirection: "column", gap: 6 }}>
-        {steps.map((s) => (
-          <div key={s.text} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11 }}>
-            <span
-              className={s.state === "active" ? "df-pulse" : ""}
-              style={{
-                width: 16,
-                height: 16,
-                borderRadius: "50%",
-                border: `1.5px solid ${s.color}`,
-                color: s.color,
-                fontSize: 8,
-                fontWeight: 700,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-              }}
-            >
-              {s.glyph}
-            </span>
-            <span style={{ flex: 1, color: s.color }}>{s.text}</span>
-          </div>
-        ))}
-      </div>
-
-      <div
-        className="df-pulse"
-        style={{
-          position: "absolute",
-          top: 12,
-          right: 14,
-          fontFamily: "JetBrains Mono, monospace",
-          fontSize: 9,
-          color: AMBER,
-        }}
-      >
-        live
-      </div>
-    </div>
-  );
-}
-
-/* ------------------------------ TRACE ------------------------------ */
-
-interface TraceLine {
-  time: string;
-  agent: string;
-  color: string;
-  message: string;
-  active?: boolean;
-  cursorColor?: string;
-}
-
-const traceLines: TraceLine[] = MANAGER_MOCK_TRACE.map((e) => ({
-  time: e.time,
-  agent: AGENT_DISPLAY_LABEL[e.agent],
-  color: e.agentColor,
-  message: e.message,
-  active: e.isActive || undefined,
-  cursorColor: e.isActive ? e.agentColor : undefined,
-}));
-
-function TracePanel() {
-  return (
-    <section
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-        borderBottom: "1px solid var(--border)",
-      }}
-    >
-      <div
-        style={{
-          padding: "12px 20px",
-          borderBottom: "1px solid var(--border)",
-          display: "flex",
-          justifyContent: "space-between",
-        }}
-      >
-        <span style={panelLabel("var(--text3)")}>Live Reasoning Trace</span>
-        <span
-          style={{
-            fontSize: 9,
-            color: AMBER,
-            fontFamily: "JetBrains Mono, monospace",
-            letterSpacing: "0.08em",
-          }}
-        >
-          MANAGER MODE
-        </span>
-      </div>
-      <div style={{ overflowY: "auto", padding: "12px 20px" }}>
-        {traceLines.map((e, i) => {
-          const isLast = i === traceLines.length - 1;
-          return (
-            <div
-              key={i}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "70px 110px 1fr",
-                gap: 12,
-                padding: "8px 0",
-                borderBottom: isLast ? "none" : "1px solid var(--border)",
-                alignItems: "start",
-              }}
-            >
-              <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: "var(--text3)" }}>
-                {e.time}
-              </div>
-              <div
-                style={{
-                  fontFamily: "JetBrains Mono, monospace",
-                  fontSize: 11,
-                  fontWeight: 500,
-                  color: e.color,
-                }}
-              >
-                {e.agent}
-              </div>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: e.active ? "var(--text)" : "var(--text2)",
-                  lineHeight: 1.5,
-                }}
-              >
-                {e.message}
-                {e.active && (
-                  <span className="df-cursor" style={{ background: e.cursorColor ?? "var(--teal)" }} />
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
 /* ------------------------------ TEAM TABLE ------------------------------ */
 
 type Tone = "high" | "mid" | "low";
@@ -333,15 +142,14 @@ interface Member {
   nameColor?: string;
   role: string;
   readiness: number;
-  readinessTone: Tone; // high=green, mid=amber, low=coral
+  readinessTone: Tone;
   loadHrs: string;
-  loadTone: "good" | "mid" | "bad"; // green / amber / coral
+  loadTone: "good" | "mid" | "bad";
   risk: "Low" | "Medium" | "High";
   rowBg?: string;
   action: { type: "text"; text: string; color: string } | { type: "button"; text: string };
 }
 
-/* Adapter: TeamMember (canonical) → Member (local render shape). Visuals unchanged. */
 function readinessTone(pct: number): Tone {
   if (pct >= READINESS_THRESHOLDS.high) return "high";
   if (pct >= READINESS_THRESHOLDS.mid) return "mid";
@@ -388,24 +196,6 @@ const toneToColor = (t: Tone) =>
   t === "high" ? "var(--done)" : t === "mid" ? "var(--amber)" : "var(--coral)";
 const loadToColor = (t: Member["loadTone"]) =>
   t === "good" ? "var(--done)" : t === "mid" ? "var(--amber)" : "var(--coral)";
-
-function riskBadgeStyle(r: Member["risk"]): CSSProperties {
-  const base: CSSProperties = {
-    fontSize: 9,
-    fontWeight: 600,
-    padding: "2px 7px",
-    borderRadius: 4,
-    textTransform: "uppercase",
-    letterSpacing: "0.06em",
-    border: "1px solid",
-    display: "inline-block",
-  };
-  if (r === "High")
-    return { ...base, background: "var(--coral-dim)", borderColor: "var(--coral)", color: "var(--coral)" };
-  if (r === "Medium")
-    return { ...base, background: "var(--amber-dim)", borderColor: AMBER, color: AMBER };
-  return { ...base, background: "var(--done-dim)", borderColor: "var(--done)", color: "var(--done)" };
-}
 
 const th: CSSProperties = {
   textAlign: "left",
@@ -490,35 +280,7 @@ function TeamTablePanel() {
                   </td>
                   <td style={{ ...rowTd, color: "var(--text2)", fontSize: 11 }}>{m.role}</td>
                   <td style={rowTd}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <div
-                        style={{
-                          height: 4,
-                          background: "var(--border2)",
-                          borderRadius: 2,
-                          maxWidth: 80,
-                          width: 80,
-                          overflow: "hidden",
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: `${m.readiness}%`,
-                            height: "100%",
-                            background: readinessColor,
-                          }}
-                        />
-                      </div>
-                      <span
-                        style={{
-                          fontFamily: "JetBrains Mono, monospace",
-                          fontSize: 10,
-                          color: readinessColor,
-                        }}
-                      >
-                        {m.readiness}%
-                      </span>
-                    </div>
+                    <ReadinessBar percent={m.readiness} color={readinessColor} />
                   </td>
                   <td style={rowTd}>
                     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
@@ -543,7 +305,7 @@ function TeamTablePanel() {
                     </div>
                   </td>
                   <td style={rowTd}>
-                    <span style={riskBadgeStyle(m.risk)}>{m.risk}</span>
+                    <RiskBadge risk={m.risk} />
                   </td>
                   <td style={rowTd}>
                     {m.action.type === "text" ? (
@@ -636,11 +398,3 @@ function BottomBar() {
     </footer>
   );
 }
-
-const panelLabel = (color: string): CSSProperties => ({
-  fontSize: 10,
-  fontWeight: 600,
-  textTransform: "uppercase",
-  letterSpacing: "0.12em",
-  color,
-});

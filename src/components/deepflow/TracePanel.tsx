@@ -1,4 +1,6 @@
 import { useAgentStore } from "@/lib/deepflow/agentStore";
+import { panelLabel } from "@/lib/styles";
+import type { TraceLine, TracePanelProps } from "@/types";
 
 const shortName = (a: string) =>
   a
@@ -8,8 +10,23 @@ const shortName = (a: string) =>
     .replace("StudyPlanGenerator", "StudyPlan")
     .replace(/Agent$/, "");
 
-export function TracePanel() {
+export function TracePanel({
+  entries,
+  headerRight = "SSE CONNECTED",
+  headerRightColor = "var(--teal)",
+}: TracePanelProps = {}) {
   const { traceEntries } = useAgentStore();
+
+  const lines: TraceLine[] =
+    entries ??
+    traceEntries.map((e, i, arr) => ({
+      time: e.time,
+      agent: shortName(e.agent),
+      color: e.agentColor,
+      message: e.message,
+      active: e.isActive && i === arr.length - 1,
+    }));
+
   return (
     <section
       style={{
@@ -28,32 +45,21 @@ export function TracePanel() {
           alignItems: "center",
         }}
       >
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 600,
-            textTransform: "uppercase",
-            letterSpacing: "0.12em",
-            color: "var(--text3)",
-          }}
-        >
-          Live Reasoning Trace
-        </span>
+        <span style={panelLabel("var(--text3)")}>Live Reasoning Trace</span>
         <span
           style={{
             fontSize: 9,
-            color: "var(--teal)",
+            color: headerRightColor,
             fontFamily: "JetBrains Mono, monospace",
             letterSpacing: "0.08em",
           }}
         >
-          SSE CONNECTED
+          {headerRight}
         </span>
       </div>
       <div style={{ overflowY: "auto", padding: "12px 20px" }}>
-        {traceEntries.map((e, i) => {
-          const isLast = i === traceEntries.length - 1;
-          const active = e.isActive && isLast;
+        {lines.map((e, i) => {
+          const isLast = i === lines.length - 1;
           return (
             <div
               key={i}
@@ -80,20 +86,25 @@ export function TracePanel() {
                   fontFamily: "JetBrains Mono, monospace",
                   fontSize: 11,
                   fontWeight: 500,
-                  color: e.agentColor,
+                  color: e.color,
                 }}
               >
-                {shortName(e.agent)}
+                {e.agent}
               </div>
               <div
                 style={{
                   fontSize: 12,
-                  color: active ? "var(--text)" : "var(--text2)",
+                  color: e.active ? "var(--text)" : "var(--text2)",
                   lineHeight: 1.5,
                 }}
               >
                 {e.message}
-                {active && <span className="df-cursor" />}
+                {e.active &&
+                  (e.cursorColor ? (
+                    <span className="df-cursor" style={{ background: e.cursorColor }} />
+                  ) : (
+                    <span className="df-cursor" />
+                  ))}
               </div>
             </div>
           );
