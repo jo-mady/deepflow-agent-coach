@@ -119,10 +119,10 @@ function Sidebar() {
           gap: 8,
         }}
       >
-        <StatCard value="3" color="var(--coral)" label="At risk" />
-        <StatCard value="2" color="var(--done)" label="On track" />
-        <StatCard value="3" color={AMBER} label="Not started" />
-        <StatCard value="68%" color="var(--blue)" label="Team avg" />
+        <StatCard value={`${MANAGER_MOCK_STATS.atRisk}`} color="var(--coral)" label="At risk" />
+        <StatCard value={`${MANAGER_MOCK_STATS.onTrack}`} color="var(--done)" label="On track" />
+        <StatCard value={`${MANAGER_MOCK_STATS.notStarted}`} color={AMBER} label="Not started" />
+        <StatCard value={`${MANAGER_MOCK_STATS.teamAvg}%`} color="var(--blue)" label="Team avg" />
       </div>
     </aside>
   );
