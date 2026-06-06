@@ -1,7 +1,26 @@
 import { AgentNode, Connector } from "./AgentNode";
 import { PhaseTrack } from "./PhaseTrack";
+import { ALL_PHASES, useAgentStore } from "@/lib/deepflow/agentStore";
+
+interface NodeDef {
+  agent: string;
+  label: string;
+  badge?: string;
+  connector?: string;
+}
+
+const NODES: NodeDef[] = [
+  { agent: "EmployeeOrchestrator", label: "EmployeeOrchestrator", connector: "→ goal=AZ-104, weeks=6, style=visual" },
+  { agent: "EngagementAgent", label: "EngagementAgent", badge: "CORE", connector: "→ cognitive_load stored in state" },
+  { agent: "PathCuratorAgent", label: "PathCuratorAgent", connector: "→ 3 paths → plan generator" },
+  { agent: "StudyPlanGenerator", label: "StudyPlanGenerator", connector: "→ plan → CalendarAgent" },
+  { agent: "AssessmentAgent", label: "AssessmentAgent" },
+];
 
 export function PipelinePanel() {
+  const { agents, currentPhase, cognitiveLoad } = useAgentStore();
+  const stepNumber = ALL_PHASES.indexOf(currentPhase) + 1;
+
   return (
     <aside
       style={{
@@ -42,57 +61,34 @@ export function PipelinePanel() {
             color: "var(--teal)",
           }}
         >
-          STEP 3 OF 5
+          STEP {stepNumber} OF {ALL_PHASES.length}
         </span>
       </div>
 
-      <PhaseTrack
-        phases={[
-          { label: "Profile", state: "done" },
-          { label: "Curate", state: "done" },
-          { label: "Plan", state: "active" },
-          { label: "Confirm", state: "default" },
-          { label: "Assess", state: "default" },
-        ]}
-      />
+      <PhaseTrack />
 
       {/* Agent list */}
       <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column" }}>
-        <AgentNode
-          name="EmployeeOrchestrator"
-          subtitle="Routing · intent extracted"
-          state="done"
-          meta="0.3s"
-        />
-        <Connector label="→ goal=AZ-104, weeks=6, style=visual" />
-        <AgentNode
-          name="EngagementAgent"
-          badge="CORE"
-          subtitle="Cognitive load: moderate+hard → 30min"
-          state="done"
-          meta="1.1s"
-        />
-        <Connector label="→ cognitive_load stored in state" />
-        <AgentNode
-          name="PathCuratorAgent"
-          subtitle="3 paths ranked · MS Learn MCP"
-          state="done"
-          meta="2.4s"
-        />
-        <Connector label="→ 3 paths → plan generator" />
-        <AgentNode
-          name="StudyPlanGenerator"
-          subtitle="Sequencing topics · placing hard on Fri..."
-          state="active"
-          meta="live"
-          metaLive
-        />
-        <Connector label="→ plan → CalendarAgent" />
-        <AgentNode
-          name="AssessmentAgent"
-          subtitle="Waiting · Foundry IQ ready"
-          state="waiting"
-        />
+        {NODES.map((n, i) => {
+          const s = agents[n.agent];
+          if (!s) return null;
+          const visualState =
+            s.status === "done" ? "done" : s.status === "running" ? "active" : "waiting";
+          const isLast = i === NODES.length - 1;
+          return (
+            <div key={n.agent}>
+              <AgentNode
+                name={n.label}
+                badge={n.badge}
+                subtitle={s.subtitle}
+                state={visualState}
+                meta={s.meta || undefined}
+                metaLive={s.meta === "live"}
+              />
+              {!isLast && n.connector && <Connector label={n.connector} />}
+            </div>
+          );
+        })}
 
         {/* CriticSafety */}
         <div
@@ -124,36 +120,38 @@ export function PipelinePanel() {
       <div style={{ flex: 1 }} />
 
       {/* Cognitive load card */}
-      <div
-        style={{
-          margin: "0 16px 16px",
-          padding: "10px 14px",
-          borderRadius: 8,
-          border: "1px solid var(--amber)",
-          background: "var(--amber-dim)",
-          display: "flex",
-          gap: 10,
-          alignItems: "flex-start",
-        }}
-      >
-        <div style={{ fontSize: 16, lineHeight: 1 }}>🧠</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          <div
-            style={{
-              fontSize: 10,
-              fontWeight: 600,
-              color: "var(--amber)",
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-            }}
-          >
-            Today's Cognitive Load
-          </div>
-          <div style={{ fontSize: 11, color: "var(--text2)", lineHeight: 1.4 }}>
-            Moderate schedule · NSG is hard (3 prereqs) → 30min session
+      {cognitiveLoad && (
+        <div
+          style={{
+            margin: "0 16px 16px",
+            padding: "10px 14px",
+            borderRadius: 8,
+            border: "1px solid var(--amber)",
+            background: "var(--amber-dim)",
+            display: "flex",
+            gap: 10,
+            alignItems: "flex-start",
+          }}
+        >
+          <div style={{ fontSize: 16, lineHeight: 1 }}>🧠</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div
+              style={{
+                fontSize: 10,
+                fontWeight: 600,
+                color: "var(--amber)",
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+              }}
+            >
+              Today's Cognitive Load
+            </div>
+            <div style={{ fontSize: 11, color: "var(--text2)", lineHeight: 1.4 }}>
+              {cognitiveLoad.pressure} · {cognitiveLoad.difficulty} → {cognitiveLoad.recommendation}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </aside>
   );
 }

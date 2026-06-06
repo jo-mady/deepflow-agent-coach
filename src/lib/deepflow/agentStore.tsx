@@ -1,0 +1,387 @@
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useReducer,
+  type ReactNode,
+} from "react";
+
+/* ============================== TYPES ============================== */
+
+export type AgentStatus = "waiting" | "running" | "done" | "blocked";
+export type Phase = "profile" | "curate" | "plan" | "confirm" | "assess";
+
+export interface AgentState {
+  status: AgentStatus;
+  subtitle: string;
+  meta: string;
+  reasoning: string;
+}
+
+export interface TraceEntry {
+  time: string;
+  agent: string;
+  agentColor: string;
+  message: string;
+  isActive: boolean;
+}
+
+export interface CognitiveLoad {
+  pressure: string;
+  difficulty: string;
+  recommendation: string;
+}
+
+export interface TeamStats {
+  atRisk: number;
+  onTrack: number;
+  notStarted: number;
+  teamAvg: number;
+}
+
+export interface PipelineState {
+  currentPhase: Phase;
+  agents: Record<string, AgentState>;
+  agentOrder: string[]; // for step-forward
+  traceEntries: TraceEntry[];
+  cognitiveLoad: CognitiveLoad | null;
+
+  // Assessment
+  assessmentScore: number;
+  questionResults: ("correct" | "wrong" | "active" | "pending")[];
+  currentQuestion: number;
+
+  // Manager
+  managerStep: 1 | 2 | 3;
+  teamStats: TeamStats;
+}
+
+/* ============================== COLORS ============================== */
+
+const AGENT_COLORS: Record<string, string> = {
+  EmployeeOrchestrator: "var(--purple)",
+  Orchestrator: "var(--purple)",
+  ManagerOrchestrator: "var(--done)",
+  EngagementAgent: "var(--amber)",
+  Engagement: "var(--amber)",
+  CriticSafetyAgent: "var(--done)",
+  CriticSafety: "var(--done)",
+  PathCuratorAgent: "var(--teal)",
+  PathCurator: "var(--teal)",
+  StudyPlanGenerator: "var(--teal)",
+  StudyPlan: "var(--teal)",
+  AssessmentAgent: "var(--purple)",
+  Assessment: "var(--purple)",
+  ManagerInsightsAgent: "var(--amber)",
+  MgrInsights: "var(--amber)",
+};
+
+export const colorForAgent = (name: string): string =>
+  AGENT_COLORS[name] ?? AGENT_COLORS[name.replace(/Agent$/, "")] ?? "var(--text2)";
+
+/* ============================== INITIAL STATES ============================== */
+
+const employeeInitial: PipelineState = {
+  currentPhase: "plan",
+  agentOrder: [
+    "EmployeeOrchestrator",
+    "EngagementAgent",
+    "PathCuratorAgent",
+    "StudyPlanGenerator",
+    "AssessmentAgent",
+  ],
+  agents: {
+    EmployeeOrchestrator: {
+      status: "done",
+      subtitle: "Routing · intent extracted",
+      meta: "0.3s",
+      reasoning:
+        "Extracted goal AZ-104, 6 weeks, visual learner. Routing to EngagementAgent first to assess your cognitive state.",
+    },
+    EngagementAgent: {
+      status: "done",
+      subtitle: "Cognitive load: moderate+hard → 30min",
+      meta: "1.1s",
+      reasoning:
+        "You have 3 meetings today — moderate pressure. NSG has 3 prerequisites which makes it hard. I'm planning a 30-minute focused session for today.",
+    },
+    PathCuratorAgent: {
+      status: "done",
+      subtitle: "3 paths ranked · MS Learn MCP",
+      meta: "2.4s",
+      reasoning:
+        "I picked these 3 paths because you learn best with documentation and they cover AZ-104 domains within your 6-week timeline. [Source: engineering_cert_guide.md]",
+    },
+    StudyPlanGenerator: {
+      status: "running",
+      subtitle: "Sequencing topics · placing hard on Fri...",
+      meta: "live",
+      reasoning:
+        "Scheduling VNet before NSG — NSG requires VNet knowledge. Placing NSG on Friday, your lightest day. Building 6-week plan now...",
+    },
+    AssessmentAgent: {
+      status: "waiting",
+      subtitle: "Waiting · Foundry IQ ready",
+      meta: "",
+      reasoning: "",
+    },
+  },
+  traceEntries: [
+    {
+      time: "00:00.3",
+      agent: "EmployeeOrchestrator",
+      agentColor: colorForAgent("EmployeeOrchestrator"),
+      message:
+        "Extracted goal AZ-104, 6 weeks, visual learner. Routing to EngagementAgent first to assess your cognitive state.",
+      isActive: false,
+    },
+    {
+      time: "00:01.1",
+      agent: "EngagementAgent",
+      agentColor: colorForAgent("EngagementAgent"),
+      message:
+        "You have 3 meetings today — moderate pressure. NSG has 3 prerequisites which makes it hard. I'm planning a 30-minute focused session for today.",
+      isActive: false,
+    },
+    {
+      time: "00:01.4",
+      agent: "CriticSafetyAgent",
+      agentColor: colorForAgent("CriticSafetyAgent"),
+      message: "Cognitive load output approved. No safety flags. Passing to state.",
+      isActive: false,
+    },
+    {
+      time: "00:02.1",
+      agent: "PathCuratorAgent",
+      agentColor: colorForAgent("PathCuratorAgent"),
+      message:
+        "I picked these 3 paths because you learn best with documentation and they cover AZ-104 domains within your 6-week timeline. [Source: engineering_cert_guide.md]",
+      isActive: false,
+    },
+    {
+      time: "00:04.8",
+      agent: "StudyPlanGenerator",
+      agentColor: colorForAgent("StudyPlanGenerator"),
+      message:
+        "Scheduling VNet before NSG — NSG requires VNet knowledge. Placing NSG on Friday, your lightest day. Building 6-week plan now...",
+      isActive: true,
+    },
+  ],
+  cognitiveLoad: {
+    pressure: "Moderate schedule",
+    difficulty: "NSG is hard (3 prereqs)",
+    recommendation: "30min session",
+  },
+  assessmentScore: 0,
+  questionResults: ["pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending"],
+  currentQuestion: 1,
+  managerStep: 2,
+  teamStats: { atRisk: 3, onTrack: 2, notStarted: 3, teamAvg: 68 },
+};
+
+const assessmentInitial: PipelineState = {
+  ...employeeInitial,
+  currentPhase: "assess",
+  agents: {
+    ...employeeInitial.agents,
+    EmployeeOrchestrator: {
+      status: "waiting",
+      subtitle: "Waiting for result · will route on score",
+      meta: "",
+      reasoning: "",
+    },
+    EngagementAgent: {
+      status: "done",
+      subtitle: "Friday · light schedule → assessment approved",
+      meta: "done",
+      reasoning:
+        "Your Friday has just 1 meeting. Clear head, optimal for assessment. Approving assessment for today.",
+    },
+    AssessmentAgent: {
+      status: "running",
+      subtitle: "Q6 of 10 · Foundry IQ grounded · citing docs",
+      meta: "live",
+      reasoning:
+        "Generating Q6 on NSG topics. Retrieving chunks from Foundry IQ knowledge base...",
+    },
+  },
+  assessmentScore: 60,
+  questionResults: ["correct", "correct", "wrong", "correct", "wrong", "active", "pending", "pending", "pending", "pending"],
+  currentQuestion: 6,
+  traceEntries: [],
+};
+
+const managerInitial: PipelineState = {
+  ...employeeInitial,
+  currentPhase: "plan",
+  agentOrder: ["ManagerOrchestrator", "ManagerInsightsAgent"],
+  agents: {
+    ManagerOrchestrator: {
+      status: "done",
+      subtitle: "Routing · team context loaded",
+      meta: "0.4s",
+      reasoning: "Manager session started. Loading team context for TEAM-A · 8 members.",
+    },
+    ManagerInsightsAgent: {
+      status: "running",
+      subtitle: "Gap analysis → report → suggestions",
+      meta: "live",
+      reasoning: "Analysing skill gaps across 8 team members.",
+    },
+  },
+  managerStep: 2,
+  traceEntries: [],
+};
+
+const PRESETS = {
+  employee: employeeInitial,
+  assessment: assessmentInitial,
+  manager: managerInitial,
+} as const;
+
+export type Preset = keyof typeof PRESETS;
+
+/* ============================== REDUCER ============================== */
+
+type Action =
+  | { type: "ADVANCE_AGENT"; agent: string; patch: Partial<AgentState> }
+  | { type: "SET_PHASE"; phase: Phase }
+  | { type: "ADD_TRACE"; entry: TraceEntry }
+  | { type: "UPDATE_ASSESSMENT"; score: number; results: PipelineState["questionResults"] }
+  | { type: "RESET" }
+  | { type: "LOAD_PRESET"; preset: Preset }
+  | { type: "STEP_FORWARD" };
+
+const stepPhase = (agent: string, fallback: Phase): Phase => {
+  switch (agent) {
+    case "EmployeeOrchestrator":
+      return "profile";
+    case "EngagementAgent":
+      return "curate";
+    case "PathCuratorAgent":
+      return "curate";
+    case "StudyPlanGenerator":
+      return "plan";
+    case "AssessmentAgent":
+      return "assess";
+    default:
+      return fallback;
+  }
+};
+
+function reducer(state: PipelineState, action: Action): PipelineState {
+  switch (action.type) {
+    case "ADVANCE_AGENT": {
+      const current = state.agents[action.agent] ?? {
+        status: "waiting",
+        subtitle: "",
+        meta: "",
+        reasoning: "",
+      };
+      return {
+        ...state,
+        agents: { ...state.agents, [action.agent]: { ...current, ...action.patch } },
+      };
+    }
+    case "SET_PHASE":
+      return { ...state, currentPhase: action.phase };
+    case "ADD_TRACE": {
+      const next = state.traceEntries.map((t) => ({ ...t, isActive: false }));
+      next.push(action.entry);
+      return { ...state, traceEntries: next };
+    }
+    case "UPDATE_ASSESSMENT":
+      return { ...state, assessmentScore: action.score, questionResults: action.results };
+    case "RESET":
+      return employeeInitial;
+    case "LOAD_PRESET":
+      return PRESETS[action.preset];
+    case "STEP_FORWARD": {
+      const order = state.agentOrder;
+      const runningIdx = order.findIndex((a) => state.agents[a]?.status === "running");
+      const nextAgents = { ...state.agents };
+      let phase = state.currentPhase;
+
+      if (runningIdx === -1) {
+        // start the first waiting
+        const firstWaiting = order.find((a) => state.agents[a]?.status === "waiting");
+        if (firstWaiting) {
+          nextAgents[firstWaiting] = { ...nextAgents[firstWaiting], status: "running", meta: "live" };
+          phase = stepPhase(firstWaiting, phase);
+        }
+      } else {
+        const current = order[runningIdx];
+        nextAgents[current] = { ...nextAgents[current], status: "done", meta: "done" };
+        const next = order[runningIdx + 1];
+        if (next) {
+          nextAgents[next] = { ...nextAgents[next], status: "running", meta: "live" };
+          phase = stepPhase(next, phase);
+        } else {
+          phase = "assess";
+        }
+      }
+
+      return { ...state, agents: nextAgents, currentPhase: phase };
+    }
+    default:
+      return state;
+  }
+}
+
+/* ============================== CONTEXT ============================== */
+
+interface StoreApi extends PipelineState {
+  advanceAgent: (agent: string, patch: Partial<AgentState>) => void;
+  setPhase: (phase: Phase) => void;
+  addTraceEntry: (entry: TraceEntry) => void;
+  updateAssessment: (score: number, results: PipelineState["questionResults"]) => void;
+  resetPipeline: () => void;
+  loadPreset: (preset: Preset) => void;
+  stepForward: () => void;
+}
+
+const AgentContext = createContext<StoreApi | null>(null);
+
+export function AgentProvider({ children }: { children: ReactNode }) {
+  const [state, dispatch] = useReducer(reducer, employeeInitial);
+
+  const advanceAgent = useCallback(
+    (agent: string, patch: Partial<AgentState>) => dispatch({ type: "ADVANCE_AGENT", agent, patch }),
+    [],
+  );
+  const setPhase = useCallback((phase: Phase) => dispatch({ type: "SET_PHASE", phase }), []);
+  const addTraceEntry = useCallback((entry: TraceEntry) => dispatch({ type: "ADD_TRACE", entry }), []);
+  const updateAssessment = useCallback(
+    (score: number, results: PipelineState["questionResults"]) =>
+      dispatch({ type: "UPDATE_ASSESSMENT", score, results }),
+    [],
+  );
+  const resetPipeline = useCallback(() => dispatch({ type: "RESET" }), []);
+  const loadPreset = useCallback((preset: Preset) => dispatch({ type: "LOAD_PRESET", preset }), []);
+  const stepForward = useCallback(() => dispatch({ type: "STEP_FORWARD" }), []);
+
+  const value = useMemo<StoreApi>(
+    () => ({
+      ...state,
+      advanceAgent,
+      setPhase,
+      addTraceEntry,
+      updateAssessment,
+      resetPipeline,
+      loadPreset,
+      stepForward,
+    }),
+    [state, advanceAgent, setPhase, addTraceEntry, updateAssessment, resetPipeline, loadPreset, stepForward],
+  );
+
+  return <AgentContext.Provider value={value}>{children}</AgentContext.Provider>;
+}
+
+export function useAgentStore(): StoreApi {
+  const ctx = useContext(AgentContext);
+  if (!ctx) throw new Error("useAgentStore must be used within AgentProvider");
+  return ctx;
+}
+
+export const ALL_PHASES: Phase[] = ["profile", "curate", "plan", "confirm", "assess"];

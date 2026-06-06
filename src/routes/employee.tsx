@@ -4,7 +4,6 @@ import { PipelinePanel } from "@/components/deepflow/PipelinePanel";
 import { TracePanel } from "@/components/deepflow/TracePanel";
 import { StudyPlanPanel } from "@/components/deepflow/StudyPlanPanel";
 import { InputBar } from "@/components/deepflow/InputBar";
-import { useSSE } from "@/hooks/useSSE";
 
 export const Route = createFileRoute("/employee")({
   head: () => ({
@@ -17,8 +16,6 @@ export const Route = createFileRoute("/employee")({
 });
 
 function EmployeePage() {
-  const { events } = useSSE("employee", "EMP-001");
-
   return (
     <DeepFlowLayout persona="employee" sessionId="EMP-001">
       <main
@@ -39,7 +36,7 @@ function EmployeePage() {
             minHeight: 0,
           }}
         >
-          <TracePanel events={events} />
+          <TracePanel />
           <StudyPlanPanel />
         </div>
       </main>

@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import { TopBar } from "@/components/deepflow/TopBar";
+import { DebugPanel } from "@/components/deepflow/DebugPanel";
 import { useVoice } from "@/hooks/useVoice";
 import { useSSE, type Persona } from "@/hooks/useSSE";
 
@@ -22,6 +23,8 @@ export function DeepFlowLayout({ persona, sessionId, children }: DeepFlowLayoutP
     <div style={{ display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
       <TopBar voiceEnabled={voiceEnabled} onToggleVoice={toggle} />
       {children}
+      <DebugPanel />
     </div>
   );
 }
+
