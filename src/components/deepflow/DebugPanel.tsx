@@ -99,7 +99,7 @@ export function DebugPanel() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-        }}
+          cursor: "pointer",
       >
         ⚙️
       </button>
