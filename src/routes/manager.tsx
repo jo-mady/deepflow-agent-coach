@@ -2,6 +2,13 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, type CSSProperties } from "react";
 import { DeepFlowLayout } from "@/components/deepflow/DeepFlowLayout";
 import { AgentNode, Connector } from "@/components/deepflow/AgentNode";
+import {
+  MANAGER_MOCK_STATS,
+  MANAGER_MOCK_TEAM,
+  MANAGER_MOCK_TRACE,
+} from "@/data/mockData";
+import { AGENT_DISPLAY_LABEL, READINESS_THRESHOLDS } from "@/constants";
+import type { TeamMember } from "@/types";
 
 export const Route = createFileRoute("/manager")({
   head: () => ({
@@ -112,10 +119,10 @@ function Sidebar() {
           gap: 8,
         }}
       >
-        <StatCard value="3" color="var(--coral)" label="At risk" />
-        <StatCard value="2" color="var(--done)" label="On track" />
-        <StatCard value="3" color={AMBER} label="Not started" />
-        <StatCard value="68%" color="var(--blue)" label="Team avg" />
+        <StatCard value={`${MANAGER_MOCK_STATS.atRisk}`} color="var(--coral)" label="At risk" />
+        <StatCard value={`${MANAGER_MOCK_STATS.onTrack}`} color="var(--done)" label="On track" />
+        <StatCard value={`${MANAGER_MOCK_STATS.notStarted}`} color={AMBER} label="Not started" />
+        <StatCard value={`${MANAGER_MOCK_STATS.teamAvg}%`} color="var(--blue)" label="Team avg" />
       </div>
     </aside>
   );
@@ -230,38 +237,14 @@ interface TraceLine {
   cursorColor?: string;
 }
 
-const traceLines: TraceLine[] = [
-  {
-    time: "09:10.2",
-    agent: "Orchestrator",
-    color: "var(--done)",
-    message:
-      "Manager session started. Loading team context for TEAM-A · 8 members · Cloud Engineering role.",
-  },
-  {
-    time: "09:10.8",
-    agent: "MgrInsights",
-    color: AMBER,
-    message:
-      "Analysing skill gaps across 8 team members. 3 of 8 Cloud Engineers are missing AZ-104 as required by Fabric IQ role mapping.",
-  },
-  {
-    time: "09:11.4",
-    agent: "CriticSafety",
-    color: "var(--done)",
-    message:
-      "Gap analysis approved. Privacy check passed — showing aggregates only, no raw employee session data.",
-  },
-  {
-    time: "09:12.1",
-    agent: "MgrInsights",
-    color: AMBER,
-    message:
-      "Generating readiness report. EMP-003 has lightest meeting load this week (avg 12hrs) — suggesting them first for AZ-104. Building suggestion...",
-    active: true,
-    cursorColor: AMBER,
-  },
-];
+const traceLines: TraceLine[] = MANAGER_MOCK_TRACE.map((e) => ({
+  time: e.time,
+  agent: AGENT_DISPLAY_LABEL[e.agent],
+  color: e.agentColor,
+  message: e.message,
+  active: e.isActive || undefined,
+  cursorColor: e.isActive ? e.agentColor : undefined,
+}));
 
 function TracePanel() {
   return (
@@ -358,66 +341,48 @@ interface Member {
   action: { type: "text"; text: string; color: string } | { type: "button"; text: string };
 }
 
-const members: Member[] = [
-  {
-    name: "Alex M.",
-    id: "EMP-001",
-    role: "Cloud Eng.",
-    readiness: 82,
-    readinessTone: "high",
-    loadHrs: "12h/wk",
-    loadTone: "good",
-    risk: "Low",
-    action: { type: "text", text: "✓ Suggested", color: "var(--done)" },
-  },
-  {
-    name: "Jordan K.",
-    id: "EMP-002",
-    role: "Cloud Eng.",
-    readiness: 28,
-    readinessTone: "low",
-    loadHrs: "26h/wk",
-    loadTone: "bad",
-    risk: "High",
-    rowBg: "var(--coral-dim)",
-    action: { type: "text", text: "High load", color: "var(--text3)" },
-  },
-  {
-    name: "Sam R.",
-    id: "EMP-003",
-    nameColor: AMBER,
-    role: "Cloud Eng.",
-    readiness: 45,
-    readinessTone: "mid",
-    loadHrs: "12h/wk",
-    loadTone: "good",
-    risk: "Medium",
-    rowBg: "rgba(0,212,170,0.04)",
-    action: { type: "button", text: "Suggest AZ-104 ↗" },
-  },
-  {
-    name: "Taylor B.",
-    id: "EMP-004",
-    role: "DevOps Eng.",
-    readiness: 71,
-    readinessTone: "high",
-    loadHrs: "18h/wk",
-    loadTone: "mid",
-    risk: "Low",
-    action: { type: "text", text: "On track", color: "var(--text3)" },
-  },
-  {
-    name: "Morgan L.",
-    id: "EMP-005",
-    role: "Cloud Eng.",
-    readiness: 12,
-    readinessTone: "low",
-    loadHrs: "24h/wk",
-    loadTone: "bad",
-    risk: "High",
-    action: { type: "text", text: "High load", color: "var(--text3)" },
-  },
-];
+/* Adapter: TeamMember (canonical) → Member (local render shape). Visuals unchanged. */
+function readinessTone(pct: number): Tone {
+  if (pct >= READINESS_THRESHOLDS.high) return "high";
+  if (pct >= READINESS_THRESHOLDS.mid) return "mid";
+  return "low";
+}
+function loadTone(hrs: number): Member["loadTone"] {
+  if (hrs <= 12) return "good";
+  if (hrs <= 19) return "mid";
+  return "bad";
+}
+function toMember(tm: TeamMember): Member {
+  const isHighLoad = tm.weeklyMeetingHours >= 26;
+  const rowBg = tm.isBeingSuggested
+    ? "rgba(0,212,170,0.04)"
+    : tm.isAtRisk && isHighLoad
+      ? "var(--coral-dim)"
+      : undefined;
+  const action: Member["action"] =
+    tm.action.type === "suggest_cert"
+      ? { type: "button", text: tm.action.label }
+      : {
+          type: "text",
+          text: tm.action.label,
+          color: tm.action.type === "suggested" ? "var(--done)" : "var(--text3)",
+        };
+  return {
+    name: tm.name,
+    id: tm.employeeId,
+    nameColor: tm.isBeingSuggested ? AMBER : undefined,
+    role: tm.role,
+    readiness: tm.readinessPercent,
+    readinessTone: readinessTone(tm.readinessPercent),
+    loadHrs: `${tm.weeklyMeetingHours}h/wk`,
+    loadTone: loadTone(tm.weeklyMeetingHours),
+    risk: tm.risk,
+    rowBg,
+    action,
+  };
+}
+
+const members: Member[] = MANAGER_MOCK_TEAM.map(toMember);
 
 const toneToColor = (t: Tone) =>
   t === "high" ? "var(--done)" : t === "mid" ? "var(--amber)" : "var(--coral)";

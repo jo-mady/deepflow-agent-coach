@@ -2,6 +2,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import type { CSSProperties } from "react";
 import { DeepFlowLayout } from "@/components/deepflow/DeepFlowLayout";
 import { AgentNode, Connector } from "@/components/deepflow/AgentNode";
+import {
+  ASSESSMENT_MOCK_QUESTION,
+  ASSESSMENT_MOCK_STATE,
+  ASSESSMENT_MOCK_TRACE,
+} from "@/data/mockData";
+import { AGENT_DISPLAY_LABEL } from "@/constants";
+import type { QuestionResult } from "@/types";
 
 export const Route = createFileRoute("/assessment")({
   head: () => ({
@@ -185,18 +192,11 @@ function Sidebar() {
   );
 }
 
-const questionDots: ("correct" | "wrong" | "active" | "empty")[] = [
-  "correct",
-  "correct",
-  "wrong",
-  "correct",
-  "wrong",
-  "active",
-  "empty",
-  "empty",
-  "empty",
-  "empty",
-];
+// Map typed QuestionResult → visual dot state ("pending" → "empty").
+const questionDots: ("correct" | "wrong" | "active" | "empty")[] =
+  ASSESSMENT_MOCK_STATE.questionResults.map((r: QuestionResult) =>
+    r === "pending" ? "empty" : r,
+  );
 
 function PhaseTrackAssessment() {
   const phases = [
@@ -279,45 +279,14 @@ interface TraceLine {
   cursorColor?: string;
 }
 
-const traceLines: TraceLine[] = [
-  {
-    time: "08:52.1",
-    agent: "Engagement",
-    color: "var(--amber)",
-    message:
-      "Your Friday has just 1 meeting. Clear head, optimal for assessment. Approving assessment for today.",
-  },
-  {
-    time: "08:52.3",
-    agent: "CriticSafety",
-    color: "var(--done)",
-    message:
-      "Assessment trigger approved. No safety flags. Human confirmation gate passed.",
-  },
-  {
-    time: "08:52.8",
-    agent: "Assessment",
-    color: PURPLE,
-    message:
-      "Querying Foundry IQ for VNet topic. Retrieved 3 chunks from az_104_study_guide.md. Generating Q1.",
-  },
-  {
-    time: "08:57.2",
-    agent: "Assessment",
-    color: PURPLE,
-    message:
-      "Q3 incorrect — NSG rule limit topic. Q5 incorrect — VNet peering limits. Noting weak topics.",
-  },
-  {
-    time: "08:59.1",
-    agent: "Assessment",
-    color: PURPLE,
-    message:
-      "Generating Q6 on NSG topics. Retrieving chunks from Foundry IQ knowledge base...",
-    active: true,
-    cursorColor: PURPLE,
-  },
-];
+const traceLines: TraceLine[] = ASSESSMENT_MOCK_TRACE.map((e) => ({
+  time: e.time,
+  agent: AGENT_DISPLAY_LABEL[e.agent],
+  color: e.agentColor,
+  message: e.message,
+  active: e.isActive || undefined,
+  cursorColor: e.isActive ? e.agentColor : undefined,
+}));
 
 function TracePanel() {
   return (
@@ -396,12 +365,11 @@ function TracePanel() {
 /* ------------------------------ QUESTION ------------------------------ */
 
 function QuestionPanel() {
-  const options = [
-    { key: "A", text: "100 rules", selected: false },
-    { key: "B", text: "200 rules", selected: true },
-    { key: "C", text: "500 rules", selected: false },
-    { key: "D", text: "1000 rules", selected: false },
-  ];
+  const options = ASSESSMENT_MOCK_QUESTION.options.map((o) => ({
+    key: o.key,
+    text: o.text,
+    selected: ASSESSMENT_MOCK_QUESTION.selectedOption === o.key,
+  }));
 
   return (
     <section style={{ background: "var(--surface)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
