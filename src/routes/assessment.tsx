@@ -192,18 +192,11 @@ function Sidebar() {
   );
 }
 
-const questionDots: ("correct" | "wrong" | "active" | "empty")[] = [
-  "correct",
-  "correct",
-  "wrong",
-  "correct",
-  "wrong",
-  "active",
-  "empty",
-  "empty",
-  "empty",
-  "empty",
-];
+// Map typed QuestionResult → visual dot state ("pending" → "empty").
+const questionDots: ("correct" | "wrong" | "active" | "empty")[] =
+  ASSESSMENT_MOCK_STATE.questionResults.map((r: QuestionResult) =>
+    r === "pending" ? "empty" : r,
+  );
 
 function PhaseTrackAssessment() {
   const phases = [
