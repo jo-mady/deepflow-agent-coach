@@ -231,8 +231,18 @@ export interface PhaseTrackProps {
   phases: PhaseItem[];
 }
 
+export interface TraceLine {
+  time: string;
+  agent: string;
+  color: string;
+  message: string;
+  active?: boolean;
+  cursorColor?: string;
+}
+
 export interface TracePanelProps {
-  entries: TraceEntry[];
+  /** When provided, renders these lines verbatim. Otherwise falls back to the agent store. */
+  entries?: TraceLine[];
   headerRight?: string;
   headerRightColor?: string;
 }
