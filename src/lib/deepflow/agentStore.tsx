@@ -6,79 +6,30 @@ import {
   useReducer,
   type ReactNode,
 } from "react";
+import { AGENT_COLORS, EMPLOYEE_PHASES } from "@/constants";
+import type {
+  AgentState,
+  AgentStoreAction,
+  CognitiveLoad,
+  EmployeePhase,
+  ManagerInsightStep,
+  PipelineState,
+  QuestionResult,
+  TeamStats,
+  TraceEntry,
+} from "@/types";
 
-/* ============================== TYPES ============================== */
-
-export type AgentStatus = "waiting" | "running" | "done" | "blocked";
-export type Phase = "profile" | "curate" | "plan" | "confirm" | "assess";
-
-export interface AgentState {
-  status: AgentStatus;
-  subtitle: string;
-  meta: string;
-  reasoning: string;
-}
-
-export interface TraceEntry {
-  time: string;
-  agent: string;
-  agentColor: string;
-  message: string;
-  isActive: boolean;
-}
-
-export interface CognitiveLoad {
-  pressure: string;
-  difficulty: string;
-  recommendation: string;
-}
-
-export interface TeamStats {
-  atRisk: number;
-  onTrack: number;
-  notStarted: number;
-  teamAvg: number;
-}
-
-export interface PipelineState {
-  currentPhase: Phase;
-  agents: Record<string, AgentState>;
-  agentOrder: string[]; // for step-forward
-  traceEntries: TraceEntry[];
-  cognitiveLoad: CognitiveLoad | null;
-
-  // Assessment
-  assessmentScore: number;
-  questionResults: ("correct" | "wrong" | "active" | "pending")[];
-  currentQuestion: number;
-
-  // Manager
-  managerStep: 1 | 2 | 3;
-  teamStats: TeamStats;
-}
-
-/* ============================== COLORS ============================== */
-
-const AGENT_COLORS: Record<string, string> = {
-  EmployeeOrchestrator: "var(--purple)",
-  Orchestrator: "var(--purple)",
-  ManagerOrchestrator: "var(--done)",
-  EngagementAgent: "var(--amber)",
-  Engagement: "var(--amber)",
-  CriticSafetyAgent: "var(--done)",
-  CriticSafety: "var(--done)",
-  PathCuratorAgent: "var(--teal)",
-  PathCurator: "var(--teal)",
-  StudyPlanGenerator: "var(--teal)",
-  StudyPlan: "var(--teal)",
-  AssessmentAgent: "var(--purple)",
-  Assessment: "var(--purple)",
-  ManagerInsightsAgent: "var(--amber)",
-  MgrInsights: "var(--amber)",
-};
+/* Re-export commonly used items for back-compat with existing imports. */
+export type { AgentState, PipelineState, TraceEntry, CognitiveLoad, TeamStats } from "@/types";
+export type Phase = EmployeePhase;
+export type AgentStatus = AgentState["status"];
 
 export const colorForAgent = (name: string): string =>
-  AGENT_COLORS[name] ?? AGENT_COLORS[name.replace(/Agent$/, "")] ?? "var(--text2)";
+  (AGENT_COLORS as Record<string, string>)[name] ??
+  (AGENT_COLORS as Record<string, string>)[name.replace(/Agent$/, "")] ??
+  "var(--text2)";
+
+export const ALL_PHASES: EmployeePhase[] = EMPLOYEE_PHASES.map((p) => p.key);
 
 /* ============================== INITIAL STATES ============================== */
 
@@ -169,14 +120,26 @@ const employeeInitial: PipelineState = {
     },
   ],
   cognitiveLoad: {
-    pressure: "Moderate schedule",
-    difficulty: "NSG is hard (3 prereqs)",
+    pressure: "moderate",
+    difficulty: "hard",
     recommendation: "30min session",
+    sessionMinutes: 30,
   },
   assessmentScore: 0,
-  questionResults: ["pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending", "pending"],
+  questionResults: [
+    "pending",
+    "pending",
+    "pending",
+    "pending",
+    "pending",
+    "pending",
+    "pending",
+    "pending",
+    "pending",
+    "pending",
+  ] as QuestionResult[],
   currentQuestion: 1,
-  managerStep: 2,
+  managerStep: 2 as ManagerInsightStep,
   teamStats: { atRisk: 3, onTrack: 2, notStarted: 3, teamAvg: 68 },
 };
 
@@ -207,7 +170,18 @@ const assessmentInitial: PipelineState = {
     },
   },
   assessmentScore: 60,
-  questionResults: ["correct", "correct", "wrong", "correct", "wrong", "active", "pending", "pending", "pending", "pending"],
+  questionResults: [
+    "correct",
+    "correct",
+    "wrong",
+    "correct",
+    "wrong",
+    "active",
+    "pending",
+    "pending",
+    "pending",
+    "pending",
+  ],
   currentQuestion: 6,
   traceEntries: [],
 };
@@ -244,16 +218,7 @@ export type Preset = keyof typeof PRESETS;
 
 /* ============================== REDUCER ============================== */
 
-type Action =
-  | { type: "ADVANCE_AGENT"; agent: string; patch: Partial<AgentState> }
-  | { type: "SET_PHASE"; phase: Phase }
-  | { type: "ADD_TRACE"; entry: TraceEntry }
-  | { type: "UPDATE_ASSESSMENT"; score: number; results: PipelineState["questionResults"] }
-  | { type: "RESET" }
-  | { type: "LOAD_PRESET"; preset: Preset }
-  | { type: "STEP_FORWARD" };
-
-const stepPhase = (agent: string, fallback: Phase): Phase => {
+const stepPhase = (agent: string, fallback: EmployeePhase): EmployeePhase => {
   switch (agent) {
     case "EmployeeOrchestrator":
       return "profile";
@@ -270,7 +235,7 @@ const stepPhase = (agent: string, fallback: Phase): Phase => {
   }
 };
 
-function reducer(state: PipelineState, action: Action): PipelineState {
+function reducer(state: PipelineState, action: AgentStoreAction): PipelineState {
   switch (action.type) {
     case "ADVANCE_AGENT": {
       const current = state.agents[action.agent] ?? {
@@ -304,7 +269,6 @@ function reducer(state: PipelineState, action: Action): PipelineState {
       let phase = state.currentPhase;
 
       if (runningIdx === -1) {
-        // start the first waiting
         const firstWaiting = order.find((a) => state.agents[a]?.status === "waiting");
         if (firstWaiting) {
           nextAgents[firstWaiting] = { ...nextAgents[firstWaiting], status: "running", meta: "live" };
@@ -333,9 +297,9 @@ function reducer(state: PipelineState, action: Action): PipelineState {
 
 interface StoreApi extends PipelineState {
   advanceAgent: (agent: string, patch: Partial<AgentState>) => void;
-  setPhase: (phase: Phase) => void;
+  setPhase: (phase: EmployeePhase) => void;
   addTraceEntry: (entry: TraceEntry) => void;
-  updateAssessment: (score: number, results: PipelineState["questionResults"]) => void;
+  updateAssessment: (score: number, results: QuestionResult[]) => void;
   resetPipeline: () => void;
   loadPreset: (preset: Preset) => void;
   stepForward: () => void;
@@ -347,18 +311,28 @@ export function AgentProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, employeeInitial);
 
   const advanceAgent = useCallback(
-    (agent: string, patch: Partial<AgentState>) => dispatch({ type: "ADVANCE_AGENT", agent, patch }),
+    (agent: string, patch: Partial<AgentState>) =>
+      dispatch({ type: "ADVANCE_AGENT", agent, patch }),
     [],
   );
-  const setPhase = useCallback((phase: Phase) => dispatch({ type: "SET_PHASE", phase }), []);
-  const addTraceEntry = useCallback((entry: TraceEntry) => dispatch({ type: "ADD_TRACE", entry }), []);
+  const setPhase = useCallback(
+    (phase: EmployeePhase) => dispatch({ type: "SET_PHASE", phase }),
+    [],
+  );
+  const addTraceEntry = useCallback(
+    (entry: TraceEntry) => dispatch({ type: "ADD_TRACE", entry }),
+    [],
+  );
   const updateAssessment = useCallback(
-    (score: number, results: PipelineState["questionResults"]) =>
+    (score: number, results: QuestionResult[]) =>
       dispatch({ type: "UPDATE_ASSESSMENT", score, results }),
     [],
   );
   const resetPipeline = useCallback(() => dispatch({ type: "RESET" }), []);
-  const loadPreset = useCallback((preset: Preset) => dispatch({ type: "LOAD_PRESET", preset }), []);
+  const loadPreset = useCallback(
+    (preset: Preset) => dispatch({ type: "LOAD_PRESET", preset }),
+    [],
+  );
   const stepForward = useCallback(() => dispatch({ type: "STEP_FORWARD" }), []);
 
   const value = useMemo<StoreApi>(
@@ -372,7 +346,16 @@ export function AgentProvider({ children }: { children: ReactNode }) {
       loadPreset,
       stepForward,
     }),
-    [state, advanceAgent, setPhase, addTraceEntry, updateAssessment, resetPipeline, loadPreset, stepForward],
+    [
+      state,
+      advanceAgent,
+      setPhase,
+      addTraceEntry,
+      updateAssessment,
+      resetPipeline,
+      loadPreset,
+      stepForward,
+    ],
   );
 
   return <AgentContext.Provider value={value}>{children}</AgentContext.Provider>;
@@ -383,5 +366,3 @@ export function useAgentStore(): StoreApi {
   if (!ctx) throw new Error("useAgentStore must be used within AgentProvider");
   return ctx;
 }
-
-export const ALL_PHASES: Phase[] = ["profile", "curate", "plan", "confirm", "assess"];
