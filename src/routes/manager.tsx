@@ -237,38 +237,14 @@ interface TraceLine {
   cursorColor?: string;
 }
 
-const traceLines: TraceLine[] = [
-  {
-    time: "09:10.2",
-    agent: "Orchestrator",
-    color: "var(--done)",
-    message:
-      "Manager session started. Loading team context for TEAM-A · 8 members · Cloud Engineering role.",
-  },
-  {
-    time: "09:10.8",
-    agent: "MgrInsights",
-    color: AMBER,
-    message:
-      "Analysing skill gaps across 8 team members. 3 of 8 Cloud Engineers are missing AZ-104 as required by Fabric IQ role mapping.",
-  },
-  {
-    time: "09:11.4",
-    agent: "CriticSafety",
-    color: "var(--done)",
-    message:
-      "Gap analysis approved. Privacy check passed — showing aggregates only, no raw employee session data.",
-  },
-  {
-    time: "09:12.1",
-    agent: "MgrInsights",
-    color: AMBER,
-    message:
-      "Generating readiness report. EMP-003 has lightest meeting load this week (avg 12hrs) — suggesting them first for AZ-104. Building suggestion...",
-    active: true,
-    cursorColor: AMBER,
-  },
-];
+const traceLines: TraceLine[] = MANAGER_MOCK_TRACE.map((e) => ({
+  time: e.time,
+  agent: AGENT_DISPLAY_LABEL[e.agent],
+  color: e.agentColor,
+  message: e.message,
+  active: e.isActive || undefined,
+  cursorColor: e.isActive ? e.agentColor : undefined,
+}));
 
 function TracePanel() {
   return (
