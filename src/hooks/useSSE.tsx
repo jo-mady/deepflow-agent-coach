@@ -6,9 +6,14 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { employeeMockEvents, type SSEEvent as MockSSEEvent } from "@/lib/deepflow/mockEvents";
-import { colorForAgent, useAgentStore } from "@/lib/deepflow/agentStore";
-import { AGENT_COLORS } from "@/constants";
+import {
+  employeeMockEvents,
+  managerMockEvents,
+  type SSEEvent as MockSSEEvent,
+} from "@/lib/deepflow/mockEvents";
+import { useAgentStore } from "@/lib/deepflow/agentStore";
+import { AGENT_COLORS, colorForAgent } from "@/constants";
+import type { AgentName, SSEEvent } from "@/types";
 import type { AgentName, SSEEvent } from "@/types";
 
 export type Persona = "employee" | "manager";
