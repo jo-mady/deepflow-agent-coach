@@ -49,3 +49,39 @@ export const employeeMockEvents: SSEEvent[] = [
     timestamp: "00:04.8",
   },
 ];
+
+export const managerMockEvents: SSEEvent[] = [
+  {
+    session_id: "MGR-001",
+    agent: "ManagerOrchestrator",
+    status: "done",
+    message: "Manager session started. Routing · loading team context for TEAM-A · 8 members.",
+    payload: { team: "TEAM-A", members: 8 },
+    timestamp: "00:00.4",
+  },
+  {
+    session_id: "MGR-001",
+    agent: "ManagerInsightsAgent",
+    status: "running",
+    message: "Analysing skill gaps across 8 team members...",
+    payload: {},
+    timestamp: "00:01.2",
+  },
+  {
+    session_id: "MGR-001",
+    agent: "CriticSafetyAgent",
+    status: "done",
+    message: "Insights output approved. No safety flags. Passing to state.",
+    payload: { blocks: 0, warns: 0 },
+    timestamp: "00:02.0",
+  },
+  {
+    session_id: "MGR-001",
+    agent: "ManagerInsightsAgent",
+    status: "done",
+    message:
+      "3 of 8 Cloud Engineers missing AZ-104. Suggesting EMP-003 start first — lightest meeting load.",
+    payload: { missing: 3, suggestion: "EMP-003" },
+    timestamp: "00:03.1",
+  },
+];

@@ -6,9 +6,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { employeeMockEvents, type SSEEvent as MockSSEEvent } from "@/lib/deepflow/mockEvents";
-import { colorForAgent, useAgentStore } from "@/lib/deepflow/agentStore";
-import { AGENT_COLORS } from "@/constants";
+import {
+  employeeMockEvents,
+  managerMockEvents,
+  type SSEEvent as MockSSEEvent,
+} from "@/lib/deepflow/mockEvents";
+import { useAgentStore } from "@/lib/deepflow/agentStore";
+import { AGENT_COLORS, colorForAgent } from "@/constants";
 import type { AgentName, SSEEvent } from "@/types";
 
 export type Persona = "employee" | "manager";
@@ -66,19 +70,16 @@ export function useSSE(persona: Persona, sessionId: string): UseSSEResult {
     API_URL ? "reconnecting" : "mock",
   );
   const esRef = useRef<EventSource | null>(null);
-  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /* -------- MOCK MODE -------- */
   useEffect(() => {
     if (API_URL) return;
     setConnectionState("mock");
-    setEvents(persona === "employee" ? employeeMockEvents : []);
+    setEvents(persona === "employee" ? employeeMockEvents : managerMockEvents);
     // The agent store initial state already mirrors the mock data; do not
     // re-dispatch on mount to avoid duplicating trace entries.
-    void advanceAgent;
-    void addTraceEntry;
-    void sessionId;
-  }, [persona, sessionId, advanceAgent, addTraceEntry]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [persona]);
 
   /* -------- REAL MODE -------- */
   useEffect(() => {
@@ -88,63 +89,54 @@ export function useSSE(persona: Persona, sessionId: string): UseSSEResult {
     let cancelled = false;
     const url = `${API_URL}/api/${persona}/stream?session_id=${encodeURIComponent(sessionId)}`;
 
-    const connect = (): void => {
+    const es = new EventSource(url);
+    esRef.current = es;
+
+    es.onopen = () => {
       if (cancelled) return;
-      const es = new EventSource(url);
-      esRef.current = es;
-
-      es.onopen = () => {
-        if (cancelled) return;
-        setConnectionState("connected");
-      };
-
-      es.onmessage = (event: MessageEvent<string>) => {
-        if (cancelled) return;
-        let data: SSEEvent;
-        try {
-          data = JSON.parse(event.data) as SSEEvent;
-        } catch {
-          return;
-        }
-
-        advanceAgent(data.agent, {
-          status: data.status === "running" ? "running" : data.status,
-          subtitle: data.message,
-          meta: data.status === "running" ? "live" : "done",
-        });
-        addTraceEntry({
-          time: formatTimestamp(data.timestamp),
-          agent: data.agent,
-          agentColor:
-            AGENT_COLORS[data.agent as AgentName] ?? colorForAgent(data.agent) ?? "var(--text3)",
-          message: data.message,
-          isActive: data.status === "running",
-        });
-      };
-
-      es.onerror = () => {
-        if (cancelled) return;
-        es.close();
-        esRef.current = null;
-        setConnectionState("reconnecting");
-        addTraceEntry({
-          time: formatTimestamp(new Date().toISOString()),
-          agent: "EmployeeOrchestrator",
-          agentColor: "var(--coral)",
-          message: "⚠ Connection lost. Reconnecting...",
-          isActive: true,
-        });
-        reconnectTimerRef.current = setTimeout(connect, 2000);
-      };
+      setConnectionState("connected");
     };
 
-    connect();
+    es.onmessage = (event: MessageEvent<string>) => {
+      if (cancelled) return;
+      let data: SSEEvent;
+      try {
+        data = JSON.parse(event.data) as SSEEvent;
+      } catch {
+        return;
+      }
+
+      advanceAgent(data.agent, {
+        status: data.status === "running" ? "running" : data.status,
+        subtitle: data.message,
+        meta: data.status === "running" ? "live" : "done",
+      });
+      addTraceEntry({
+        time: formatTimestamp(data.timestamp),
+        agent: data.agent,
+        agentColor:
+          AGENT_COLORS[data.agent as AgentName] ?? colorForAgent(data.agent) ?? "var(--text3)",
+        message: data.message,
+        isActive: data.status === "running",
+      });
+    };
+
+    es.onerror = () => {
+      if (cancelled) return;
+      // Let the native EventSource handle reconnection automatically.
+      setConnectionState("reconnecting");
+      addTraceEntry({
+        time: formatTimestamp(new Date().toISOString()),
+        agent: "EmployeeOrchestrator",
+        agentColor: "var(--coral)",
+        message: "⚠ Connection lost. Reconnecting...",
+        isActive: true,
+      });
+    };
 
     return () => {
       cancelled = true;
-      if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
-      reconnectTimerRef.current = null;
-      esRef.current?.close();
+      es.close();
       esRef.current = null;
     };
   }, [persona, sessionId, advanceAgent, addTraceEntry]);

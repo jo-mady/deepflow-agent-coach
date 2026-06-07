@@ -6,7 +6,7 @@ import {
   useReducer,
   type ReactNode,
 } from "react";
-import { AGENT_COLORS, EMPLOYEE_PHASES } from "@/constants";
+import { EMPLOYEE_PHASES, MAX_TRACE_ENTRIES, colorForAgent } from "@/constants";
 import type {
   AgentState,
   AgentStoreAction,
@@ -23,11 +23,6 @@ import type {
 export type { AgentState, PipelineState, TraceEntry, CognitiveLoad, TeamStats } from "@/types";
 export type Phase = EmployeePhase;
 export type AgentStatus = AgentState["status"];
-
-export const colorForAgent = (name: string): string =>
-  (AGENT_COLORS as Record<string, string>)[name] ??
-  (AGENT_COLORS as Record<string, string>)[name.replace(/Agent$/, "")] ??
-  "var(--text2)";
 
 export const ALL_PHASES: EmployeePhase[] = EMPLOYEE_PHASES.map((p) => p.key);
 
@@ -254,7 +249,7 @@ function reducer(state: PipelineState, action: AgentStoreAction): PipelineState 
     case "ADD_TRACE": {
       const next = state.traceEntries.map((t) => ({ ...t, isActive: false }));
       next.push(action.entry);
-      return { ...state, traceEntries: next };
+      return { ...state, traceEntries: next.slice(-MAX_TRACE_ENTRIES) };
     }
     case "UPDATE_ASSESSMENT":
       return { ...state, assessmentScore: action.score, questionResults: action.results };
