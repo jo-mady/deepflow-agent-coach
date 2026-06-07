@@ -56,6 +56,12 @@ Most AI systems are black boxes. DeepFlow is a glass box. The UI renders every a
 Judges don't have to trust that multi-agent reasoning is happening. They watch it happen.
 
 ---
+## 🌐 Interactive Preview
+
+Click the image below to open the live, interactive app preview in Lovable:
+
+[![Watch the demo](https://preview--deepflow-agent-coach.lovable.app/employee)
+
 
 ## Architecture
 
