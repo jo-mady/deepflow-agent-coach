@@ -6,7 +6,7 @@ import {
   useReducer,
   type ReactNode,
 } from "react";
-import { AGENT_COLORS, EMPLOYEE_PHASES } from "@/constants";
+import { EMPLOYEE_PHASES, MAX_TRACE_ENTRIES, colorForAgent } from "@/constants";
 import type {
   AgentState,
   AgentStoreAction,
