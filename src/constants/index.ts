@@ -87,6 +87,10 @@ export const ASSESSMENT = {
   passThreshold: 75,
 } as const;
 
+/* ============================== TRACE ============================== */
+
+export const MAX_TRACE_ENTRIES = 200;
+
 /* ============================== COGNITIVE LOAD MATRIX ============================== */
 
 export const COGNITIVE_LOAD_MATRIX: Record<
