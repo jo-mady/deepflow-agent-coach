@@ -249,7 +249,7 @@ function reducer(state: PipelineState, action: AgentStoreAction): PipelineState 
     case "ADD_TRACE": {
       const next = state.traceEntries.map((t) => ({ ...t, isActive: false }));
       next.push(action.entry);
-      return { ...state, traceEntries: next };
+      return { ...state, traceEntries: next.slice(-MAX_TRACE_ENTRIES) };
     }
     case "UPDATE_ASSESSMENT":
       return { ...state, assessmentScore: action.score, questionResults: action.results };
