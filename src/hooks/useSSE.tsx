@@ -70,19 +70,16 @@ export function useSSE(persona: Persona, sessionId: string): UseSSEResult {
     API_URL ? "reconnecting" : "mock",
   );
   const esRef = useRef<EventSource | null>(null);
-  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /* -------- MOCK MODE -------- */
   useEffect(() => {
     if (API_URL) return;
     setConnectionState("mock");
-    setEvents(persona === "employee" ? employeeMockEvents : []);
+    setEvents(persona === "employee" ? employeeMockEvents : managerMockEvents);
     // The agent store initial state already mirrors the mock data; do not
     // re-dispatch on mount to avoid duplicating trace entries.
-    void advanceAgent;
-    void addTraceEntry;
-    void sessionId;
-  }, [persona, sessionId, advanceAgent, addTraceEntry]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [persona]);
 
   /* -------- REAL MODE -------- */
   useEffect(() => {
