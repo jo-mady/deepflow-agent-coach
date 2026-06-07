@@ -60,7 +60,7 @@ Judges don't have to trust that multi-agent reasoning is happening. They watch i
 
 Click the image below to open the live, interactive app preview in Lovable:
 
-[![Watch the demo](https://preview--deepflow-agent-coach.lovable.app/employee)
+[![Watch the demo]](https://preview--deepflow-agent-coach.lovable.app/employee)
 
 
 ## Architecture
