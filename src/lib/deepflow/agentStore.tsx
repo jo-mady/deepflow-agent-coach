@@ -24,11 +24,6 @@ export type { AgentState, PipelineState, TraceEntry, CognitiveLoad, TeamStats } 
 export type Phase = EmployeePhase;
 export type AgentStatus = AgentState["status"];
 
-export const colorForAgent = (name: string): string =>
-  (AGENT_COLORS as Record<string, string>)[name] ??
-  (AGENT_COLORS as Record<string, string>)[name.replace(/Agent$/, "")] ??
-  "var(--text2)";
-
 export const ALL_PHASES: EmployeePhase[] = EMPLOYEE_PHASES.map((p) => p.key);
 
 /* ============================== INITIAL STATES ============================== */
