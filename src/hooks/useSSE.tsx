@@ -14,7 +14,6 @@ import {
 import { useAgentStore } from "@/lib/deepflow/agentStore";
 import { AGENT_COLORS, colorForAgent } from "@/constants";
 import type { AgentName, SSEEvent } from "@/types";
-import type { AgentName, SSEEvent } from "@/types";
 
 export type Persona = "employee" | "manager";
 export type ConnectionState = "connected" | "reconnecting" | "mock";
