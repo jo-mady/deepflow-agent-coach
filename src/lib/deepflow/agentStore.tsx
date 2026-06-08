@@ -344,6 +344,10 @@ export function AgentProvider({ children }: { children: ReactNode }) {
       dispatch({ type: "SET_CLARIFICATION", result }),
     [],
   );
+  const setCertProgress = useCallback(
+    (progress: CertProgress) => dispatch({ type: "SET_CERT_PROGRESS", progress }),
+    [],
+  );
 
   const value = useMemo<StoreApi>(
     () => ({
@@ -356,6 +360,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
       loadPreset,
       stepForward,
       setClarification,
+      setCertProgress,
     }),
     [
       state,
@@ -367,6 +372,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
       loadPreset,
       stepForward,
       setClarification,
+      setCertProgress,
     ],
   );
 
