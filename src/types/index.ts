@@ -105,6 +105,9 @@ export interface PipelineState {
 
   // Clarification
   clarificationAnswer: ClarificationAnswer | null;
+
+  // Cert progress
+  certProgress: CertProgress | null;
 }
 
 export type AgentStoreAction =
