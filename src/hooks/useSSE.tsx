@@ -150,6 +150,17 @@ export function useSSE(persona: Persona, sessionId: string): UseSSEResult {
       ) {
         setPhase("done");
       }
+
+      if (data.agent === "AssessmentAgent" && data.status === "done" && data.payload) {
+        const passed = data.payload.passed === true;
+        const weakTopics = Array.isArray(data.payload.weak_topics)
+          ? (data.payload.weak_topics as string[])
+          : [];
+        if (!passed && weakTopics.length > 0) {
+          setWeakTopics(weakTopics);
+          setPhase("revising");
+        }
+      }
     };
 
     es.onerror = () => {
