@@ -259,6 +259,8 @@ function reducer(state: PipelineState, action: AgentStoreAction): PipelineState 
       return employeeInitial;
     case "LOAD_PRESET":
       return PRESETS[action.preset];
+    case "SET_CLARIFICATION":
+      return { ...state, clarificationAnswer: action.result };
     case "STEP_FORWARD": {
       const order = state.agentOrder;
       const runningIdx = order.findIndex((a) => state.agents[a]?.status === "running");
