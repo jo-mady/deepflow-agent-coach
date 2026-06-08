@@ -24,7 +24,11 @@ const sessions = EMPLOYEE_MOCK_SESSIONS.map((s) => ({
 }));
 
 export function StudyPlanPanel() {
-  const { clarificationAnswer, setClarification, certProgress } = useAgentStore();
+  const { clarificationAnswer, setClarification, certProgress, currentPhase } = useAgentStore();
+  const isDone = currentPhase === "done";
+  const displayPercent = certProgress
+    ? Math.min(100, isDone ? 100 : certProgress.completionPercent)
+    : 0;
 
   return (
     <section style={{ background: "var(--surface)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
