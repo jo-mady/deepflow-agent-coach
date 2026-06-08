@@ -10,6 +10,7 @@ import { EMPLOYEE_PHASES, MAX_TRACE_ENTRIES, colorForAgent } from "@/constants";
 import type {
   AgentState,
   AgentStoreAction,
+  ClarificationAnswer,
   CognitiveLoad,
   EmployeePhase,
   ManagerInsightStep,
