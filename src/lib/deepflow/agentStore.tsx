@@ -352,6 +352,10 @@ export function AgentProvider({ children }: { children: ReactNode }) {
     (progress: CertProgress) => dispatch({ type: "SET_CERT_PROGRESS", progress }),
     [],
   );
+  const setWeakTopics = useCallback(
+    (topics: string[]) => dispatch({ type: "SET_WEAK_TOPICS", topics }),
+    [],
+  );
 
   const value = useMemo<StoreApi>(
     () => ({
