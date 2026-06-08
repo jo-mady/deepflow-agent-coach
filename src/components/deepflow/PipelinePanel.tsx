@@ -73,7 +73,17 @@ export function PipelinePanel() {
               : agents[n.agent];
           if (!s) return null;
           const visualState =
-            s.status === "done" ? "done" : s.status === "running" ? "active" : "waiting";
+            s.status === "done"
+              ? "done"
+              : s.status === "running"
+                ? "active"
+                : s.status === "warn"
+                  ? "warn"
+                  : s.status === "blocked"
+                    ? "blocked"
+                    : s.status === "error"
+                      ? "error"
+                      : "waiting";
           const isLast = i === NODES.length - 1;
           return (
             <div key={n.agent}>
