@@ -15,7 +15,8 @@ const LABELS: Record<Phase, string> = {
 
 function deriveState(phase: Phase, current: Phase): PhaseState {
   const idx = ALL_PHASES.indexOf(phase);
-  const curIdx = current === "done" ? ALL_PHASES.length : ALL_PHASES.indexOf(current);
+  const effectiveCurrent: Phase = current === "revising" ? "assess" : current;
+  const curIdx = effectiveCurrent === "done" ? ALL_PHASES.length : ALL_PHASES.indexOf(effectiveCurrent);
   if (idx < curIdx) return "done";
   if (idx === curIdx) return "active";
   return "default";
