@@ -12,8 +12,8 @@ import {
   type SSEEvent as MockSSEEvent,
 } from "@/lib/deepflow/mockEvents";
 import { useAgentStore } from "@/lib/deepflow/agentStore";
-import { AGENT_COLORS, colorForAgent } from "@/constants";
-import type { AgentName, SSEEvent } from "@/types";
+import { AGENT_COLORS, RECOMMENDED_HOURS, colorForAgent } from "@/constants";
+import type { AgentName, CertId, SSEEvent } from "@/types";
 
 export type Persona = "employee" | "manager";
 export type ConnectionState = "connected" | "reconnecting" | "mock";
