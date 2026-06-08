@@ -93,15 +93,27 @@ export const ASSESSMENT = {
 
 export const MAX_TRACE_ENTRIES = 200;
 
-/* ============================== AGENT STATUS META ============================== */
+/* ============================== AGENT STATUS STYLES ============================== */
+
+export const AGENT_STATUS_STYLES: Record<
+  AgentStatus,
+  { bg: string; text: string; border: string; shadow: string }
+> = {
+  waiting: { bg: "transparent",      text: "var(--text3)", border: "var(--border2)", shadow: "none" },
+  running: { bg: "var(--teal-dim)",  text: "var(--teal)",  border: "var(--teal)",    shadow: "0 0 16px var(--teal-mid)" },
+  done:    { bg: "#48BB7808",        text: "var(--done)",  border: "#48BB7822",      shadow: "none" },
+  warn:    { bg: "var(--amber-dim)", text: "var(--amber)", border: "var(--amber)",   shadow: "none" },
+  blocked: { bg: "var(--coral-dim)", text: "var(--coral)", border: "var(--coral)",   shadow: "none" },
+  error:   { bg: "var(--coral-dim)", text: "var(--coral)", border: "var(--coral)",   shadow: "none" },
+} as const;
 
 export const AGENT_STATUS_META: Record<AgentStatus, string> = {
   waiting: "—",
   running: "live",
-  done: "done",
-  warn: "warn",
+  done:    "done",
+  warn:    "warn",
   blocked: "blocked",
-  error: "error",
+  error:   "error",
 } as const;
 
 /* ============================== RECOMMENDED HOURS ============================== */

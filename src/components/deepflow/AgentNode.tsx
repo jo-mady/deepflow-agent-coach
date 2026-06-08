@@ -1,5 +1,7 @@
 import type { CSSProperties } from "react";
-import { AGENT_STATUS_META } from "@/constants";
+import { AGENT_STATUS_META, AGENT_STATUS_STYLES } from "@/constants";
+import { Dot } from "@/components/ui/Dot";
+import { MonoText } from "@/components/ui/MonoText";
 import type { AgentStatus } from "@/types";
 
 export type NodeState = "done" | "active" | "waiting" | "warn" | "blocked" | "error";
@@ -13,86 +15,39 @@ export interface AgentNodeProps {
   badge?: string;
 }
 
-const dotStyle = (state: NodeState): CSSProperties => {
-  const base: CSSProperties = {
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    display: "inline-block",
-    flexShrink: 0,
-  };
-  if (state === "done") return { ...base, background: "var(--done)" };
-  if (state === "active") return { ...base, background: "var(--teal)" };
-  if (state === "warn") return { ...base, background: "var(--amber)" };
-  if (state === "blocked" || state === "error") return { ...base, background: "var(--coral)" };
-  return { ...base, background: "var(--slate)" };
-};
-
-const STATUS_TO_META: Partial<Record<NodeState, string>> = {
-  warn: AGENT_STATUS_META.warn,
-  blocked: AGENT_STATUS_META.blocked,
-  error: AGENT_STATUS_META.error,
-};
+/** NodeState mirrors AgentStatus except it uses "active" instead of "running". */
+const toStatus = (state: NodeState): AgentStatus =>
+  state === "active" ? "running" : state;
 
 export function AgentNode({ name, subtitle, state, meta, metaLive, badge }: AgentNodeProps) {
-  const nameColor =
-    state === "done"
-      ? "var(--done)"
-      : state === "active"
-        ? "var(--teal)"
-        : state === "warn"
-          ? "var(--amber)"
-          : state === "blocked" || state === "error"
-            ? "var(--coral)"
-            : "var(--text2)";
+  const status = toStatus(state);
+  const styles = AGENT_STATUS_STYLES[status];
 
   const cardStyle: CSSProperties = {
     position: "relative",
     borderRadius: 10,
     padding: "12px 14px",
     border: "1px solid",
+    borderColor: styles.border,
+    background: styles.bg,
+    boxShadow: styles.shadow === "none" ? undefined : styles.shadow,
   };
-  if (state === "done") {
-    cardStyle.borderColor = "var(--done-dim)";
-    cardStyle.background = "#48BB7808";
-    cardStyle.opacity = 0.75;
-  } else if (state === "active") {
-    cardStyle.borderColor = "var(--teal)";
-    cardStyle.background = "var(--teal-dim)";
-    cardStyle.boxShadow = "0 0 16px var(--teal-mid)";
-  } else if (state === "warn") {
-    cardStyle.borderColor = "var(--amber)";
-    cardStyle.background = "var(--amber-dim)";
-  } else if (state === "blocked" || state === "error") {
-    cardStyle.borderColor = "var(--coral)";
-    cardStyle.background = "var(--coral-dim)";
-  } else {
-    cardStyle.borderColor = "var(--border2)";
-    cardStyle.background = "transparent";
-    cardStyle.opacity = 0.35;
-  }
+  // Structural opacity is not a color token; keep it here.
+  if (state === "waiting") cardStyle.opacity = 0.35;
+  else if (state === "done") cardStyle.opacity = 0.75;
 
-  const resolvedMeta = STATUS_TO_META[state] ?? meta;
-  const metaColor =
-    state === "warn"
-      ? "var(--amber)"
-      : state === "blocked" || state === "error"
-        ? "var(--coral)"
-        : metaLive
-          ? "var(--teal)"
-          : "var(--text3)";
-  const showPulse = state === "active";
+  const resolvedMeta = meta && meta.length > 0 ? meta : AGENT_STATUS_META[status];
 
   return (
     <div style={cardStyle}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span className={showPulse ? "df-pulse" : ""} style={dotStyle(state)} />
+        <Dot color={styles.text} size={8} pulse={status === "running"} />
         <span
           style={{
             fontSize: 12,
             fontWeight: 600,
             letterSpacing: "-0.2px",
-            color: nameColor,
+            color: styles.text,
           }}
         >
           {name}
@@ -124,17 +79,16 @@ export function AgentNode({ name, subtitle, state, meta, metaLive, badge }: Agen
       </div>
       {resolvedMeta && (
         <div
-          className={metaLive && state === "active" ? "df-pulse" : ""}
+          className={metaLive && status === "running" ? "df-pulse" : ""}
           style={{
             position: "absolute",
             top: 12,
             right: 14,
-            fontFamily: "JetBrains Mono, monospace",
-            fontSize: 9,
-            color: metaColor,
           }}
         >
-          {resolvedMeta}
+          <MonoText size={9} color={styles.text}>
+            {resolvedMeta}
+          </MonoText>
         </div>
       )}
     </div>
