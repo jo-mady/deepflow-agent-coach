@@ -369,6 +369,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
       stepForward,
       setClarification,
       setCertProgress,
+      setWeakTopics,
     }),
     [
       state,
@@ -381,6 +382,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
       stepForward,
       setClarification,
       setCertProgress,
+      setWeakTopics,
     ],
   );
 
