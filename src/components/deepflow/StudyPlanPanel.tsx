@@ -1,4 +1,4 @@
-import { EMPLOYEE_MOCK_MILESTONES, EMPLOYEE_MOCK_SESSIONS, EMPLOYEE_MOCK_PROGRESS } from "@/data/mockData";
+import { EMPLOYEE_MOCK_MILESTONES, EMPLOYEE_MOCK_SESSIONS } from "@/data/mockData";
 import { PanelHeader } from "@/components/ui/PanelHeader";
 import { PanelCard } from "@/components/ui/PanelCard";
 import { SectionLabel } from "@/components/ui/SectionLabel";
