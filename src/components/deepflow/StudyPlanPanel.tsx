@@ -151,20 +151,29 @@ export function StudyPlanPanel() {
           </div>
 
           <div>
-            <SectionLabel>This Week · Sessions</SectionLabel>
-            <PanelCard>
-              {sessions.map((s, i) => (
-                <SessionRow
-                  key={s.day}
-                  day={s.day}
-                  topic={s.topic}
-                  sessionType={s.sessionType}
-                  durationMinutes={s.durationMinutes}
-                  isToday={s.isToday}
-                  isLast={i === sessions.length - 1}
-                />
-              ))}
-            </PanelCard>
+            {isDone ? (
+              <>
+                <PanelHeader left="Completion Summary" rightColor="var(--done)" padding="0 0 10px" />
+                <CompletionCard {...EMPLOYEE_MOCK_COMPLETION} />
+              </>
+            ) : (
+              <>
+                <SectionLabel>This Week · Sessions</SectionLabel>
+                <PanelCard>
+                  {sessions.map((s, i) => (
+                    <SessionRow
+                      key={s.day}
+                      day={s.day}
+                      topic={s.topic}
+                      sessionType={s.sessionType}
+                      durationMinutes={s.durationMinutes}
+                      isToday={s.isToday}
+                      isLast={i === sessions.length - 1}
+                    />
+                  ))}
+                </PanelCard>
+              </>
+            )}
           </div>
         </div>
       </div>
