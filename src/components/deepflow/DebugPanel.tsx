@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ALL_PHASES, useAgentStore, type Phase, type Preset } from "@/lib/deepflow/agentStore";
-import { MOCK_CLARIFICATION, EMPLOYEE_MOCK_PROGRESS } from "@/data/mockData";
+import { MOCK_CLARIFICATION, EMPLOYEE_MOCK_PROGRESS, EMPLOYEE_MOCK_COMPLETION } from "@/data/mockData";
 
 const PHASE_LABEL: Record<Phase, string> = {
   profile: "Profile",
