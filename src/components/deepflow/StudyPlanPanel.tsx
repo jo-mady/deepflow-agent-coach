@@ -2,6 +2,7 @@ import { EMPLOYEE_MOCK_MILESTONES, EMPLOYEE_MOCK_SESSIONS, EMPLOYEE_MOCK_COMPLET
 import { PanelHeader } from "@/components/ui/PanelHeader";
 import { PanelCard } from "@/components/ui/PanelCard";
 import { SectionLabel } from "@/components/ui/SectionLabel";
+import { Tag } from "@/components/ui/Tag";
 import { MilestoneRow } from "./MilestoneRow";
 import { SessionRow } from "./SessionRow";
 import { ClarificationAnswerCard } from "./ClarificationAnswerCard";
