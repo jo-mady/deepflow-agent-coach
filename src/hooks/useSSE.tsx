@@ -181,7 +181,7 @@ export function useSSE(persona: Persona, sessionId: string): UseSSEResult {
       es.close();
       esRef.current = null;
     };
-  }, [persona, sessionId, advanceAgent, addTraceEntry, setCertProgress, setPhase]);
+  }, [persona, sessionId, advanceAgent, addTraceEntry, setCertProgress, setPhase, setWeakTopics]);
 
   const last = events[events.length - 1];
   return {
