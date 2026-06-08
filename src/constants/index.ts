@@ -93,6 +93,17 @@ export const ASSESSMENT = {
 
 export const MAX_TRACE_ENTRIES = 200;
 
+/* ============================== AGENT STATUS META ============================== */
+
+export const AGENT_STATUS_META: Record<AgentStatus, string> = {
+  waiting: "—",
+  running: "live",
+  done: "done",
+  warn: "warn",
+  blocked: "blocked",
+  error: "error",
+} as const;
+
 /* ============================== RECOMMENDED HOURS ============================== */
 
 export const RECOMMENDED_HOURS: Record<CertId, number> = {
