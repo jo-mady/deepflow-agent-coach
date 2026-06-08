@@ -12,7 +12,7 @@ interface NodeDef {
   connector?: string;
 }
 
-const NODES: NodeDef[] = [
+const BASE_NODES: NodeDef[] = [
   { agent: "EmployeeOrchestrator", label: "EmployeeOrchestrator", connector: "→ goal=AZ-104, weeks=6, style=visual" },
   { agent: "EngagementAgent", label: "EngagementAgent", badge: "CORE", connector: "→ cognitive_load stored in state" },
   { agent: "PathCuratorAgent", label: "PathCuratorAgent", connector: "→ 3 paths → plan generator" },
@@ -20,9 +20,26 @@ const NODES: NodeDef[] = [
   { agent: "AssessmentAgent", label: "AssessmentAgent" },
 ];
 
+const CLARIFICATION_NODE: NodeDef = {
+  agent: "ClarificationAgent",
+  label: "ClarificationAgent",
+  connector: "→ question detected",
+};
+
 export function PipelinePanel() {
-  const { agents, currentPhase, cognitiveLoad } = useAgentStore();
+  const { agents, currentPhase, cognitiveLoad, clarificationAnswer } = useAgentStore();
   const stepNumber = ALL_PHASES.indexOf(currentPhase) + 1;
+
+  const NODES: NodeDef[] = clarificationAnswer
+    ? [
+        BASE_NODES[0],
+        BASE_NODES[1],
+        BASE_NODES[2],
+        { ...BASE_NODES[3], connector: "→ question detected" },
+        { ...CLARIFICATION_NODE, connector: "→ plan → CalendarAgent" },
+        BASE_NODES[4],
+      ]
+    : BASE_NODES;
 
   return (
     <aside
@@ -45,7 +62,15 @@ export function PipelinePanel() {
 
       <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column" }}>
         {NODES.map((n, i) => {
-          const s = agents[n.agent];
+          const s =
+            n.agent === "ClarificationAgent"
+              ? {
+                  status: "done" as const,
+                  subtitle: "Foundry IQ + web · answer ready",
+                  meta: "done",
+                  reasoning: "",
+                }
+              : agents[n.agent];
           if (!s) return null;
           const visualState =
             s.status === "done" ? "done" : s.status === "running" ? "active" : "waiting";

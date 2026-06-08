@@ -7,6 +7,8 @@ import { colorForAgent } from "@/constants";
 import type {
   AgentNodeData,
   AssessmentState,
+  CertProgress,
+  ClarificationAnswer,
   CognitiveLoad,
   ManagerInsightStepData,
   Milestone,
@@ -341,3 +343,36 @@ export const MANAGER_MOCK_INSIGHT_STEPS: ManagerInsightStepData[] = [
   { stepNumber: 2, label: "Generating readiness report...", status: "active" },
   { stepNumber: 3, label: "Cert suggestions", status: "waiting" },
 ];
+
+/* ============================== EMPLOYEE PROGRESS ============================== */
+
+export const EMPLOYEE_MOCK_PROGRESS: CertProgress = {
+  completionPercent: 22,
+  hoursStudied: 8.75,
+  recommendedHours: 40,
+  sessionsCompleted: 7,
+  milestonesCompleted: 1,
+  milestonesTotal: 5,
+};
+
+/* ============================== CLARIFICATION ============================== */
+
+export const MOCK_CLARIFICATION: ClarificationAnswer = {
+  answer:
+    "NSG and ASG both filter traffic, but NSGs apply at subnet or NIC level while ASGs let you group VMs by application role — making rules easier to manage at scale. [Source 1] [Source 2]",
+  sources: [
+    {
+      sourceDoc: "MS Learn · Configure NSGs",
+      sourceUrl:
+        "https://learn.microsoft.com/en-us/training/modules/configure-network-security-groups/",
+      sourceType: "ms_learn",
+    },
+    {
+      sourceDoc: "Web · Azure Networking Deep Dive",
+      sourceUrl:
+        "https://learn.microsoft.com/en-us/azure/virtual-network/application-security-groups",
+      sourceType: "web",
+    },
+  ],
+  tavilyUsed: true,
+};

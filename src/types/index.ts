@@ -99,8 +99,12 @@ export interface PipelineState {
   currentQuestion: number;
 
   // Manager
+  // Manager
   managerStep: ManagerInsightStep;
   teamStats: TeamStats;
+
+  // Clarification
+  clarificationAnswer: ClarificationAnswer | null;
 }
 
 export type AgentStoreAction =
@@ -110,7 +114,8 @@ export type AgentStoreAction =
   | { type: "UPDATE_ASSESSMENT"; score: number; results: QuestionResult[] }
   | { type: "RESET" }
   | { type: "LOAD_PRESET"; preset: "employee" | "assessment" | "manager" }
-  | { type: "STEP_FORWARD" };
+  | { type: "STEP_FORWARD" }
+  | { type: "SET_CLARIFICATION"; result: ClarificationAnswer | null };
 
 /* ============================== EMPLOYEE DOMAIN ============================== */
 
@@ -129,6 +134,27 @@ export interface CognitiveLoad {
   difficulty: TopicDifficulty;
   recommendation: string;
   sessionMinutes: number;
+}
+
+export interface CertProgress {
+  completionPercent: number;
+  hoursStudied: number;
+  recommendedHours: number;
+  sessionsCompleted: number;
+  milestonesCompleted: number;
+  milestonesTotal: number;
+}
+
+export interface ClarificationSource {
+  sourceDoc: string;
+  sourceUrl: string;
+  sourceType: "ms_learn" | "web";
+}
+
+export interface ClarificationAnswer {
+  answer: string;
+  sources: ClarificationSource[];
+  tavilyUsed: boolean;
 }
 
 export interface StudySession {

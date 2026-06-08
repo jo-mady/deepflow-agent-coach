@@ -4,6 +4,7 @@
  */
 import type {
   AgentName,
+  CertId,
   CognitiveLoadLevel,
   EmployeePhase,
   RiskLevel,
@@ -90,6 +91,13 @@ export const ASSESSMENT = {
 /* ============================== TRACE ============================== */
 
 export const MAX_TRACE_ENTRIES = 200;
+
+/* ============================== RECOMMENDED HOURS ============================== */
+
+export const RECOMMENDED_HOURS: Record<CertId, number> = {
+  "AZ-104": 40,
+  "AZ-900": 20,
+} as const;
 
 /* ============================== COGNITIVE LOAD MATRIX ============================== */
 

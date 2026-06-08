@@ -1,8 +1,13 @@
 import { useState } from "react";
+import { useAgentStore } from "@/lib/deepflow/agentStore";
 
 export function InputBar() {
   const [value, setValue] = useState("");
   const [focused, setFocused] = useState(false);
+  const { clarificationAnswer } = useAgentStore();
+  const placeholder = clarificationAnswer
+    ? "Ask another question, or continue with your plan..."
+    : "Ask DeepFlow anything about your learning plan...";
 
   return (
     <footer
@@ -24,7 +29,7 @@ export function InputBar() {
         onChange={(e) => setValue(e.target.value)}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        placeholder="Ask DeepFlow anything about your learning plan..."
+        placeholder={placeholder}
         style={{
           flex: 1,
           background: "var(--surface2)",

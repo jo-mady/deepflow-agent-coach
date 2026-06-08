@@ -10,6 +10,7 @@ import { EMPLOYEE_PHASES, MAX_TRACE_ENTRIES, colorForAgent } from "@/constants";
 import type {
   AgentState,
   AgentStoreAction,
+  ClarificationAnswer,
   CognitiveLoad,
   EmployeePhase,
   ManagerInsightStep,
@@ -136,6 +137,7 @@ const employeeInitial: PipelineState = {
   currentQuestion: 1,
   managerStep: 2 as ManagerInsightStep,
   teamStats: { atRisk: 3, onTrack: 2, notStarted: 3, teamAvg: 68 },
+  clarificationAnswer: null,
 };
 
 const assessmentInitial: PipelineState = {
@@ -257,6 +259,8 @@ function reducer(state: PipelineState, action: AgentStoreAction): PipelineState 
       return employeeInitial;
     case "LOAD_PRESET":
       return PRESETS[action.preset];
+    case "SET_CLARIFICATION":
+      return { ...state, clarificationAnswer: action.result };
     case "STEP_FORWARD": {
       const order = state.agentOrder;
       const runningIdx = order.findIndex((a) => state.agents[a]?.status === "running");
@@ -298,6 +302,7 @@ interface StoreApi extends PipelineState {
   resetPipeline: () => void;
   loadPreset: (preset: Preset) => void;
   stepForward: () => void;
+  setClarification: (result: ClarificationAnswer | null) => void;
 }
 
 const AgentContext = createContext<StoreApi | null>(null);
@@ -329,6 +334,11 @@ export function AgentProvider({ children }: { children: ReactNode }) {
     [],
   );
   const stepForward = useCallback(() => dispatch({ type: "STEP_FORWARD" }), []);
+  const setClarification = useCallback(
+    (result: ClarificationAnswer | null) =>
+      dispatch({ type: "SET_CLARIFICATION", result }),
+    [],
+  );
 
   const value = useMemo<StoreApi>(
     () => ({
@@ -340,6 +350,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
       resetPipeline,
       loadPreset,
       stepForward,
+      setClarification,
     }),
     [
       state,
@@ -350,6 +361,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
       resetPipeline,
       loadPreset,
       stepForward,
+      setClarification,
     ],
   );
 

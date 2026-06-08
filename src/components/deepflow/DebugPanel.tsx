@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ALL_PHASES, useAgentStore, type Phase, type Preset } from "@/lib/deepflow/agentStore";
+import { MOCK_CLARIFICATION } from "@/data/mockData";
 
 const PHASE_LABEL: Record<Phase, string> = {
   profile: "Profile",
@@ -11,7 +12,7 @@ const PHASE_LABEL: Record<Phase, string> = {
 
 export function DebugPanel() {
   const [open, setOpen] = useState(false);
-  const { currentPhase, setPhase, stepForward, resetPipeline, loadPreset } = useAgentStore();
+  const { currentPhase, setPhase, stepForward, resetPipeline, loadPreset, setClarification } = useAgentStore();
 
 
   return (
@@ -82,6 +83,14 @@ export function DebugPanel() {
               </button>
             ))}
           </div>
+
+          <label style={label}>Clarification</label>
+          <button onClick={() => setClarification(MOCK_CLARIFICATION)} style={secondaryBtn}>
+            Trigger Clarification
+          </button>
+          <button onClick={() => setClarification(null)} style={secondaryBtn}>
+            Clear Clarification
+          </button>
         </div>
       )}
 
