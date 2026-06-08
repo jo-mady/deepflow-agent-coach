@@ -355,6 +355,14 @@ export const EMPLOYEE_MOCK_PROGRESS: CertProgress = {
   milestonesTotal: 5,
 };
 
+export const EMPLOYEE_MOCK_COMPLETION: CompletionCardProps = {
+  certId: "AZ-104",
+  hoursStudied: 38.5,
+  sessionsCompleted: 31,
+  milestonesCompleted: 5,
+  milestonesTotal: 5,
+};
+
 /* ============================== CLARIFICATION ============================== */
 
 export const MOCK_CLARIFICATION: ClarificationAnswer = {
