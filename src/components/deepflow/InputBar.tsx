@@ -29,7 +29,7 @@ export function InputBar() {
         onChange={(e) => setValue(e.target.value)}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
-        placeholder="Ask DeepFlow anything about your learning plan..."
+        placeholder={placeholder}
         style={{
           flex: 1,
           background: "var(--surface2)",
