@@ -143,7 +143,7 @@ export function StudyPlanPanel() {
                   key={m.name}
                   name={m.name}
                   date={m.date}
-                  status={m.status}
+                  status={isDone ? "done" : m.status}
                   isLast={i === milestones.length - 1}
                 />
               ))}
