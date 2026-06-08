@@ -136,6 +136,7 @@ const employeeInitial: PipelineState = {
   currentQuestion: 1,
   managerStep: 2 as ManagerInsightStep,
   teamStats: { atRisk: 3, onTrack: 2, notStarted: 3, teamAvg: 68 },
+  clarificationAnswer: null,
 };
 
 const assessmentInitial: PipelineState = {
