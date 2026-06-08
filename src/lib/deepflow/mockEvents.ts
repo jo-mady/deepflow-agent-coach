@@ -46,6 +46,15 @@ export const employeeMockEvents: SSEEvent[] = [
     timestamp: "00:01.4",
   },
   {
+    session_id: "mock-session",
+    agent: "PathCuratorAgent",
+    status: "warn",
+    message:
+      "Your role (Cloud Engineer) typically requires AZ-104, but you selected AZ-900. Confirm to continue, or switch?",
+    payload: {},
+    timestamp: "00:01.8",
+  },
+  {
     session_id: "EMP-001",
     agent: "PathCuratorAgent",
     status: "done",
