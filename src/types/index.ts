@@ -99,8 +99,12 @@ export interface PipelineState {
   currentQuestion: number;
 
   // Manager
+  // Manager
   managerStep: ManagerInsightStep;
   teamStats: TeamStats;
+
+  // Clarification
+  clarificationAnswer: ClarificationAnswer | null;
 }
 
 export type AgentStoreAction =
