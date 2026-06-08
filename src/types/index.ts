@@ -131,6 +131,27 @@ export interface CognitiveLoad {
   sessionMinutes: number;
 }
 
+export interface CertProgress {
+  completionPercent: number;
+  hoursStudied: number;
+  recommendedHours: number;
+  sessionsCompleted: number;
+  milestonesCompleted: number;
+  milestonesTotal: number;
+}
+
+export interface ClarificationSource {
+  sourceDoc: string;
+  sourceUrl: string;
+  sourceType: "ms_learn" | "web";
+}
+
+export interface ClarificationAnswer {
+  answer: string;
+  sources: ClarificationSource[];
+  tavilyUsed: boolean;
+}
+
 export interface StudySession {
   day: string;
   topic: string;
