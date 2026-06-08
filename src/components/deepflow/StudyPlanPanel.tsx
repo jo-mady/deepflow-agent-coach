@@ -89,7 +89,7 @@ export function StudyPlanPanel() {
         >
           <div
             style={{
-              width: `${certProgress.completionPercent}%`,
+              width: `${displayPercent}%`,
               height: "100%",
               background: "linear-gradient(90deg, var(--teal), var(--blue))",
               borderRadius: 2,
