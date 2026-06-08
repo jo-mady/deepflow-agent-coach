@@ -131,6 +131,16 @@ export function DebugPanel() {
           >
             Trigger DONE phase
           </button>
+          <button
+            onClick={() => {
+              setWeakTopics(MOCK_WEAK_TOPICS);
+              setPhase("revising");
+            }}
+            style={secondaryBtn}
+          >
+            Trigger REVISING
+          </button>
+
 
           <label style={label}>Warnings</label>
           <button onClick={triggerWarn} style={secondaryBtn}>
