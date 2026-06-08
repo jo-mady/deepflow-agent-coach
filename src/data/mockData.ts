@@ -4,6 +4,7 @@
  * visual output is unchanged when components migrate to consume from here.
  */
 import { colorForAgent } from "@/constants";
+import type { CompletionCardProps } from "@/components/deepflow/CompletionCard";
 import type {
   AgentNodeData,
   AssessmentState,
