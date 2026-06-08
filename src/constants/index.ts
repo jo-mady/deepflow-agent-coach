@@ -4,6 +4,7 @@
  */
 import type {
   AgentName,
+  AgentStatus,
   CertId,
   CognitiveLoadLevel,
   EmployeePhase,
