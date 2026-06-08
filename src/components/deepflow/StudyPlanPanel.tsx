@@ -152,15 +152,23 @@ export function StudyPlanPanel() {
           <div>
             <SectionLabel>Milestones</SectionLabel>
             <PanelCard>
-              {milestones.map((m, i) => (
-                <MilestoneRow
-                  key={m.name}
-                  name={m.name}
-                  date={m.date}
-                  status={isDone ? "done" : m.status}
-                  isLast={i === milestones.length - 1}
-                />
-              ))}
+              {milestones.map((m, i) => {
+                const row = (
+                  <MilestoneRow
+                    name={m.name}
+                    date={m.date}
+                    status={isDone ? "done" : m.status}
+                    isLast={i === milestones.length - 1}
+                  />
+                );
+                return isMilestoneWeak(m.name) ? (
+                  <div key={m.name} style={{ borderLeft: "2px solid var(--coral)", paddingLeft: 6 }}>
+                    {row}
+                  </div>
+                ) : (
+                  <div key={m.name}>{row}</div>
+                );
+              })}
             </PanelCard>
           </div>
 
@@ -172,9 +180,14 @@ export function StudyPlanPanel() {
               </>
             ) : (
               <>
-                <SectionLabel>This Week · Sessions</SectionLabel>
+                <PanelHeader
+                  left={isRevising ? "Revision Sessions — Weak Topics Only" : "Study Sessions"}
+                  right={isRevising ? "ATTEMPT 2" : undefined}
+                  rightColor={isRevising ? "var(--coral)" : undefined}
+                  padding="0 0 10px"
+                />
                 <PanelCard>
-                  {sessions.map((s, i) => (
+                  {visibleSessions.map((s, i) => (
                     <SessionRow
                       key={s.day}
                       day={s.day}
@@ -182,13 +195,14 @@ export function StudyPlanPanel() {
                       sessionType={s.sessionType}
                       durationMinutes={s.durationMinutes}
                       isToday={s.isToday}
-                      isLast={i === sessions.length - 1}
+                      isLast={i === visibleSessions.length - 1}
                     />
                   ))}
                 </PanelCard>
               </>
             )}
           </div>
+
         </div>
       </div>
     </section>
