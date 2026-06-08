@@ -307,6 +307,7 @@ interface StoreApi extends PipelineState {
   loadPreset: (preset: Preset) => void;
   stepForward: () => void;
   setClarification: (result: ClarificationAnswer | null) => void;
+  setCertProgress: (progress: CertProgress) => void;
 }
 
 const AgentContext = createContext<StoreApi | null>(null);
