@@ -23,8 +23,7 @@ const sessions = EMPLOYEE_MOCK_SESSIONS.map((s) => ({
 }));
 
 export function StudyPlanPanel() {
-  const { clarificationAnswer, setClarification } = useAgentStore();
-  const p = EMPLOYEE_MOCK_PROGRESS;
+  const { clarificationAnswer, setClarification, certProgress } = useAgentStore();
 
   return (
     <section style={{ background: "var(--surface)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
@@ -35,6 +34,7 @@ export function StudyPlanPanel() {
       />
 
       {/* Cert Progress Strip */}
+      {certProgress && (
       <div
         style={{
           padding: "12px 20px",
