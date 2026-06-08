@@ -95,25 +95,26 @@ export function StudyPlanPanel() {
         <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
             <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11 }}>
-              <span style={{ color: "var(--teal)" }}>{p.hoursStudied}h</span>
-              <span style={{ color: "var(--text3)" }}> / {p.recommendedHours}h</span>
+              <span style={{ color: "var(--teal)" }}>{certProgress.hoursStudied}h</span>
+              <span style={{ color: "var(--text3)" }}> / {certProgress.recommendedHours}h</span>
             </span>
             <span style={{ fontSize: 9, color: "var(--text3)" }}>Studied</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
             <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11 }}>
-              {p.sessionsCompleted}
+              {certProgress.sessionsCompleted}
             </span>
             <span style={{ fontSize: 9, color: "var(--text3)" }}>Sessions</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
             <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11 }}>
-              {p.milestonesCompleted} / {p.milestonesTotal}
+              {certProgress.milestonesCompleted} / {certProgress.milestonesTotal}
             </span>
             <span style={{ fontSize: 9, color: "var(--text3)" }}>Milestones</span>
           </div>
         </div>
       </div>
+      )}
 
       <div style={{ overflow: "auto", padding: "16px 20px" }}>
         {clarificationAnswer && (
