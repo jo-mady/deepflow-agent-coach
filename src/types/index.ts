@@ -114,7 +114,8 @@ export type AgentStoreAction =
   | { type: "UPDATE_ASSESSMENT"; score: number; results: QuestionResult[] }
   | { type: "RESET" }
   | { type: "LOAD_PRESET"; preset: "employee" | "assessment" | "manager" }
-  | { type: "STEP_FORWARD" };
+  | { type: "STEP_FORWARD" }
+  | { type: "SET_CLARIFICATION"; result: ClarificationAnswer | null };
 
 /* ============================== EMPLOYEE DOMAIN ============================== */
 
