@@ -83,6 +83,14 @@ export function DebugPanel() {
               </button>
             ))}
           </div>
+
+          <label style={label}>Clarification</label>
+          <button onClick={() => setClarification(MOCK_CLARIFICATION)} style={secondaryBtn}>
+            Trigger Clarification
+          </button>
+          <button onClick={() => setClarification(null)} style={secondaryBtn}>
+            Clear Clarification
+          </button>
         </div>
       )}
 
