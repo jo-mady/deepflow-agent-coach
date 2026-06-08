@@ -12,7 +12,7 @@ const PHASE_LABEL: Record<Phase, string> = {
 
 export function DebugPanel() {
   const [open, setOpen] = useState(false);
-  const { currentPhase, setPhase, stepForward, resetPipeline, loadPreset } = useAgentStore();
+  const { currentPhase, setPhase, stepForward, resetPipeline, loadPreset, setClarification } = useAgentStore();
 
 
   return (
