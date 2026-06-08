@@ -1,10 +1,11 @@
-import { EMPLOYEE_MOCK_MILESTONES, EMPLOYEE_MOCK_SESSIONS } from "@/data/mockData";
+import { EMPLOYEE_MOCK_MILESTONES, EMPLOYEE_MOCK_SESSIONS, EMPLOYEE_MOCK_COMPLETION } from "@/data/mockData";
 import { PanelHeader } from "@/components/ui/PanelHeader";
 import { PanelCard } from "@/components/ui/PanelCard";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { MilestoneRow } from "./MilestoneRow";
 import { SessionRow } from "./SessionRow";
 import { ClarificationAnswerCard } from "./ClarificationAnswerCard";
+import { CompletionCard } from "./CompletionCard";
 import { useAgentStore } from "@/lib/deepflow/agentStore";
 
 /* Adapter: map typed mock data → row view shapes (visuals unchanged). */
