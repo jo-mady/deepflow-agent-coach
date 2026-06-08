@@ -64,7 +64,7 @@ export function useSSEConnection(): ConnectionState {
  * VITE_API_URL is configured, otherwise returns bundled mock data.
  */
 export function useSSE(persona: Persona, sessionId: string): UseSSEResult {
-  const { advanceAgent, addTraceEntry, setCertProgress } = useAgentStore();
+  const { advanceAgent, addTraceEntry, setCertProgress, setPhase } = useAgentStore();
   const [events, setEvents] = useState<MockSSEEvent[]>([]);
   const [connectionState, setConnectionState] = useState<ConnectionState>(
     API_URL ? "reconnecting" : "mock",
