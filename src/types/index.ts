@@ -105,6 +105,9 @@ export interface PipelineState {
 
   // Clarification
   clarificationAnswer: ClarificationAnswer | null;
+
+  // Cert progress
+  certProgress: CertProgress | null;
 }
 
 export type AgentStoreAction =
@@ -115,7 +118,8 @@ export type AgentStoreAction =
   | { type: "RESET" }
   | { type: "LOAD_PRESET"; preset: "employee" | "assessment" | "manager" }
   | { type: "STEP_FORWARD" }
-  | { type: "SET_CLARIFICATION"; result: ClarificationAnswer | null };
+  | { type: "SET_CLARIFICATION"; result: ClarificationAnswer | null }
+  | { type: "SET_CERT_PROGRESS"; progress: CertProgress };
 
 /* ============================== EMPLOYEE DOMAIN ============================== */
 

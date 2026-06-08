@@ -10,7 +10,22 @@ export const employeeMockEvents: SSEEvent[] = [
     status: "done",
     message:
       "Extracted goal AZ-104, 6 weeks, visual learner. Routing to EngagementAgent first to assess your cognitive state.",
-    payload: { goal: "AZ-104", weeks: 6, style: "visual" },
+    payload: {
+      goal: "AZ-104",
+      weeks: 6,
+      style: "visual",
+      completion_percent: 22,
+      hours_studied: 8.75,
+      sessions_completed: 7,
+      target_cert: "AZ-104",
+      milestone_progress: [
+        { name: "Networking Basics", status: "done" },
+        { name: "Identity & Access", status: "active" },
+        { name: "Storage", status: "pending" },
+        { name: "Compute", status: "pending" },
+        { name: "Monitoring", status: "pending" },
+      ],
+    },
     timestamp: "00:00.3",
   },
   {

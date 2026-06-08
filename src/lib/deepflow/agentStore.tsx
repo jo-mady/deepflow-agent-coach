@@ -10,6 +10,7 @@ import { EMPLOYEE_PHASES, MAX_TRACE_ENTRIES, colorForAgent } from "@/constants";
 import type {
   AgentState,
   AgentStoreAction,
+  CertProgress,
   ClarificationAnswer,
   CognitiveLoad,
   EmployeePhase,
@@ -138,6 +139,7 @@ const employeeInitial: PipelineState = {
   managerStep: 2 as ManagerInsightStep,
   teamStats: { atRisk: 3, onTrack: 2, notStarted: 3, teamAvg: 68 },
   clarificationAnswer: null,
+  certProgress: null,
 };
 
 const assessmentInitial: PipelineState = {
@@ -261,6 +263,8 @@ function reducer(state: PipelineState, action: AgentStoreAction): PipelineState 
       return PRESETS[action.preset];
     case "SET_CLARIFICATION":
       return { ...state, clarificationAnswer: action.result };
+    case "SET_CERT_PROGRESS":
+      return { ...state, certProgress: action.progress };
     case "STEP_FORWARD": {
       const order = state.agentOrder;
       const runningIdx = order.findIndex((a) => state.agents[a]?.status === "running");
@@ -303,6 +307,7 @@ interface StoreApi extends PipelineState {
   loadPreset: (preset: Preset) => void;
   stepForward: () => void;
   setClarification: (result: ClarificationAnswer | null) => void;
+  setCertProgress: (progress: CertProgress) => void;
 }
 
 const AgentContext = createContext<StoreApi | null>(null);
@@ -339,6 +344,10 @@ export function AgentProvider({ children }: { children: ReactNode }) {
       dispatch({ type: "SET_CLARIFICATION", result }),
     [],
   );
+  const setCertProgress = useCallback(
+    (progress: CertProgress) => dispatch({ type: "SET_CERT_PROGRESS", progress }),
+    [],
+  );
 
   const value = useMemo<StoreApi>(
     () => ({
@@ -351,6 +360,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
       loadPreset,
       stepForward,
       setClarification,
+      setCertProgress,
     }),
     [
       state,
@@ -362,6 +372,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
       loadPreset,
       stepForward,
       setClarification,
+      setCertProgress,
     ],
   );
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ALL_PHASES, useAgentStore, type Phase, type Preset } from "@/lib/deepflow/agentStore";
-import { MOCK_CLARIFICATION } from "@/data/mockData";
+import { MOCK_CLARIFICATION, EMPLOYEE_MOCK_PROGRESS } from "@/data/mockData";
 
 const PHASE_LABEL: Record<Phase, string> = {
   profile: "Profile",
@@ -12,7 +12,7 @@ const PHASE_LABEL: Record<Phase, string> = {
 
 export function DebugPanel() {
   const [open, setOpen] = useState(false);
-  const { currentPhase, setPhase, stepForward, resetPipeline, loadPreset, setClarification } = useAgentStore();
+  const { currentPhase, setPhase, stepForward, resetPipeline, loadPreset, setClarification, setCertProgress } = useAgentStore();
 
 
   return (
@@ -90,6 +90,11 @@ export function DebugPanel() {
           </button>
           <button onClick={() => setClarification(null)} style={secondaryBtn}>
             Clear Clarification
+          </button>
+
+          <label style={label}>Progress</label>
+          <button onClick={() => setCertProgress(EMPLOYEE_MOCK_PROGRESS)} style={secondaryBtn}>
+            Set Progress (22%)
           </button>
         </div>
       )}

@@ -12,8 +12,8 @@ import {
   type SSEEvent as MockSSEEvent,
 } from "@/lib/deepflow/mockEvents";
 import { useAgentStore } from "@/lib/deepflow/agentStore";
-import { AGENT_COLORS, colorForAgent } from "@/constants";
-import type { AgentName, SSEEvent } from "@/types";
+import { AGENT_COLORS, RECOMMENDED_HOURS, colorForAgent } from "@/constants";
+import type { AgentName, CertId, SSEEvent } from "@/types";
 
 export type Persona = "employee" | "manager";
 export type ConnectionState = "connected" | "reconnecting" | "mock";
@@ -64,7 +64,7 @@ export function useSSEConnection(): ConnectionState {
  * VITE_API_URL is configured, otherwise returns bundled mock data.
  */
 export function useSSE(persona: Persona, sessionId: string): UseSSEResult {
-  const { advanceAgent, addTraceEntry } = useAgentStore();
+  const { advanceAgent, addTraceEntry, setCertProgress } = useAgentStore();
   const [events, setEvents] = useState<MockSSEEvent[]>([]);
   const [connectionState, setConnectionState] = useState<ConnectionState>(
     API_URL ? "reconnecting" : "mock",
@@ -119,6 +119,28 @@ export function useSSE(persona: Persona, sessionId: string): UseSSEResult {
         message: data.message,
         isActive: data.status === "running",
       });
+
+      if (
+        data.agent === "EmployeeOrchestrator" &&
+        data.payload &&
+        data.payload.completion_percent !== undefined
+      ) {
+        const p = data.payload as {
+          completion_percent: number;
+          hours_studied: number;
+          sessions_completed: number;
+          target_cert: CertId;
+          milestone_progress: Array<{ name: string; status: string }>;
+        };
+        setCertProgress({
+          completionPercent: p.completion_percent,
+          hoursStudied: p.hours_studied,
+          recommendedHours: RECOMMENDED_HOURS[p.target_cert] ?? 40,
+          sessionsCompleted: p.sessions_completed,
+          milestonesCompleted: p.milestone_progress.filter((m) => m.status === "done").length,
+          milestonesTotal: p.milestone_progress.length,
+        });
+      }
     };
 
     es.onerror = () => {
@@ -139,7 +161,7 @@ export function useSSE(persona: Persona, sessionId: string): UseSSEResult {
       es.close();
       esRef.current = null;
     };
-  }, [persona, sessionId, advanceAgent, addTraceEntry]);
+  }, [persona, sessionId, advanceAgent, addTraceEntry, setCertProgress]);
 
   const last = events[events.length - 1];
   return {

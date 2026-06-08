@@ -1,4 +1,4 @@
-import { EMPLOYEE_MOCK_MILESTONES, EMPLOYEE_MOCK_SESSIONS, EMPLOYEE_MOCK_PROGRESS } from "@/data/mockData";
+import { EMPLOYEE_MOCK_MILESTONES, EMPLOYEE_MOCK_SESSIONS } from "@/data/mockData";
 import { PanelHeader } from "@/components/ui/PanelHeader";
 import { PanelCard } from "@/components/ui/PanelCard";
 import { SectionLabel } from "@/components/ui/SectionLabel";
@@ -23,8 +23,7 @@ const sessions = EMPLOYEE_MOCK_SESSIONS.map((s) => ({
 }));
 
 export function StudyPlanPanel() {
-  const { clarificationAnswer, setClarification } = useAgentStore();
-  const p = EMPLOYEE_MOCK_PROGRESS;
+  const { clarificationAnswer, setClarification, certProgress } = useAgentStore();
 
   return (
     <section style={{ background: "var(--surface)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
@@ -35,6 +34,7 @@ export function StudyPlanPanel() {
       />
 
       {/* Cert Progress Strip */}
+      {certProgress && (
       <div
         style={{
           padding: "12px 20px",
@@ -68,7 +68,7 @@ export function StudyPlanPanel() {
               color: "var(--teal)",
             }}
           >
-            {p.completionPercent}%
+            {certProgress.completionPercent}%
           </span>
         </div>
 
@@ -84,7 +84,7 @@ export function StudyPlanPanel() {
         >
           <div
             style={{
-              width: `${p.completionPercent}%`,
+              width: `${certProgress.completionPercent}%`,
               height: "100%",
               background: "linear-gradient(90deg, var(--teal), var(--blue))",
               borderRadius: 2,
@@ -95,25 +95,26 @@ export function StudyPlanPanel() {
         <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
             <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11 }}>
-              <span style={{ color: "var(--teal)" }}>{p.hoursStudied}h</span>
-              <span style={{ color: "var(--text3)" }}> / {p.recommendedHours}h</span>
+              <span style={{ color: "var(--teal)" }}>{certProgress.hoursStudied}h</span>
+              <span style={{ color: "var(--text3)" }}> / {certProgress.recommendedHours}h</span>
             </span>
             <span style={{ fontSize: 9, color: "var(--text3)" }}>Studied</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
             <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11 }}>
-              {p.sessionsCompleted}
+              {certProgress.sessionsCompleted}
             </span>
             <span style={{ fontSize: 9, color: "var(--text3)" }}>Sessions</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
             <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11 }}>
-              {p.milestonesCompleted} / {p.milestonesTotal}
+              {certProgress.milestonesCompleted} / {certProgress.milestonesTotal}
             </span>
             <span style={{ fontSize: 9, color: "var(--text3)" }}>Milestones</span>
           </div>
         </div>
       </div>
+      )}
 
       <div style={{ overflow: "auto", padding: "16px 20px" }}>
         {clarificationAnswer && (
