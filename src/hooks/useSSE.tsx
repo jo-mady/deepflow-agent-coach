@@ -12,7 +12,7 @@ import {
   type SSEEvent as MockSSEEvent,
 } from "@/lib/deepflow/mockEvents";
 import { useAgentStore } from "@/lib/deepflow/agentStore";
-import { AGENT_COLORS, RECOMMENDED_HOURS, colorForAgent } from "@/constants";
+import { AGENT_COLORS, AGENT_STATUS_META, RECOMMENDED_HOURS, colorForAgent } from "@/constants";
 import type { AgentName, CertId, SSEEvent } from "@/types";
 
 export type Persona = "employee" | "manager";
