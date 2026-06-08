@@ -140,6 +140,7 @@ const employeeInitial: PipelineState = {
   teamStats: { atRisk: 3, onTrack: 2, notStarted: 3, teamAvg: 68 },
   clarificationAnswer: null,
   certProgress: null,
+  weakTopics: [],
 };
 
 const assessmentInitial: PipelineState = {
