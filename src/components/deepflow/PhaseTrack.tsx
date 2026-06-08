@@ -9,6 +9,7 @@ const LABELS: Record<Phase, string> = {
   plan: "Plan",
   confirm: "Confirm",
   assess: "Assess",
+  revising: "Revising",
   done: "Done",
 };
 
