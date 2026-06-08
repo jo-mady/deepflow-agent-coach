@@ -12,7 +12,7 @@ interface NodeDef {
   connector?: string;
 }
 
-const NODES: NodeDef[] = [
+const BASE_NODES: NodeDef[] = [
   { agent: "EmployeeOrchestrator", label: "EmployeeOrchestrator", connector: "→ goal=AZ-104, weeks=6, style=visual" },
   { agent: "EngagementAgent", label: "EngagementAgent", badge: "CORE", connector: "→ cognitive_load stored in state" },
   { agent: "PathCuratorAgent", label: "PathCuratorAgent", connector: "→ 3 paths → plan generator" },
@@ -20,9 +20,23 @@ const NODES: NodeDef[] = [
   { agent: "AssessmentAgent", label: "AssessmentAgent" },
 ];
 
+const CLARIFICATION_NODE: NodeDef = {
+  agent: "ClarificationAgent",
+  label: "ClarificationAgent",
+  connector: "→ question detected",
+};
+
 export function PipelinePanel() {
-  const { agents, currentPhase, cognitiveLoad } = useAgentStore();
+  const { agents, currentPhase, cognitiveLoad, clarificationAnswer } = useAgentStore();
   const stepNumber = ALL_PHASES.indexOf(currentPhase) + 1;
+
+  const NODES: NodeDef[] = clarificationAnswer
+    ? [
+        ...BASE_NODES.slice(0, 4),
+        CLARIFICATION_NODE,
+        ...BASE_NODES.slice(4),
+      ]
+    : BASE_NODES;
 
   return (
     <aside
