@@ -8,6 +8,7 @@ const PHASE_LABEL: Record<Phase, string> = {
   plan: "Plan",
   confirm: "Confirm",
   assess: "Assess",
+  done: "Done",
 };
 
 export function DebugPanel() {
