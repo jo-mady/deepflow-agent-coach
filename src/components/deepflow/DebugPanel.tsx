@@ -91,6 +91,11 @@ export function DebugPanel() {
           <button onClick={() => setClarification(null)} style={secondaryBtn}>
             Clear Clarification
           </button>
+
+          <label style={label}>Progress</label>
+          <button onClick={() => setCertProgress(EMPLOYEE_MOCK_PROGRESS)} style={secondaryBtn}>
+            Set Progress (22%)
+          </button>
         </div>
       )}
 
