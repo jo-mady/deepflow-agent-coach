@@ -25,11 +25,19 @@ const sessions = EMPLOYEE_MOCK_SESSIONS.map((s) => ({
 }));
 
 export function StudyPlanPanel() {
-  const { clarificationAnswer, setClarification, certProgress, currentPhase } = useAgentStore();
+  const { clarificationAnswer, setClarification, certProgress, currentPhase, weakTopics } = useAgentStore();
   const isDone = currentPhase === "done";
+  const isRevising = currentPhase === "revising";
   const displayPercent = certProgress
     ? Math.min(100, isDone ? 100 : certProgress.completionPercent)
     : 0;
+
+  const matchesWeak = (text: string): boolean =>
+    weakTopics.some((t) => text.toLowerCase().includes(t.toLowerCase()));
+  const visibleSessions =
+    isRevising && weakTopics.length > 0 ? sessions.filter((s) => matchesWeak(s.topic)) : sessions;
+  const isMilestoneWeak = (milestoneName: string): boolean =>
+    isRevising && matchesWeak(milestoneName);
 
   return (
     <section style={{ background: "var(--surface)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
