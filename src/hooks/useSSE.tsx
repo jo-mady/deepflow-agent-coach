@@ -119,6 +119,28 @@ export function useSSE(persona: Persona, sessionId: string): UseSSEResult {
         message: data.message,
         isActive: data.status === "running",
       });
+
+      if (
+        data.agent === "EmployeeOrchestrator" &&
+        data.payload &&
+        data.payload.completion_percent !== undefined
+      ) {
+        const p = data.payload as {
+          completion_percent: number;
+          hours_studied: number;
+          sessions_completed: number;
+          target_cert: CertId;
+          milestone_progress: Array<{ name: string; status: string }>;
+        };
+        setCertProgress({
+          completionPercent: p.completion_percent,
+          hoursStudied: p.hours_studied,
+          recommendedHours: RECOMMENDED_HOURS[p.target_cert] ?? 40,
+          sessionsCompleted: p.sessions_completed,
+          milestonesCompleted: p.milestone_progress.filter((m) => m.status === "done").length,
+          milestonesTotal: p.milestone_progress.length,
+        });
+      }
     };
 
     es.onerror = () => {
