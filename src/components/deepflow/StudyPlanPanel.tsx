@@ -1,9 +1,11 @@
-import { EMPLOYEE_MOCK_MILESTONES, EMPLOYEE_MOCK_SESSIONS } from "@/data/mockData";
+import { EMPLOYEE_MOCK_MILESTONES, EMPLOYEE_MOCK_SESSIONS, EMPLOYEE_MOCK_PROGRESS } from "@/data/mockData";
 import { PanelHeader } from "@/components/ui/PanelHeader";
 import { PanelCard } from "@/components/ui/PanelCard";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { MilestoneRow } from "./MilestoneRow";
 import { SessionRow } from "./SessionRow";
+import { ClarificationAnswerCard } from "./ClarificationAnswerCard";
+import { useAgentStore } from "@/lib/deepflow/agentStore";
 
 /* Adapter: map typed mock data → row view shapes (visuals unchanged). */
 const milestones = EMPLOYEE_MOCK_MILESTONES.map((m) => ({
@@ -21,6 +23,9 @@ const sessions = EMPLOYEE_MOCK_SESSIONS.map((s) => ({
 }));
 
 export function StudyPlanPanel() {
+  const { clarificationAnswer, setClarification } = useAgentStore();
+  const p = EMPLOYEE_MOCK_PROGRESS;
+
   return (
     <section style={{ background: "var(--surface)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <PanelHeader
@@ -28,45 +33,133 @@ export function StudyPlanPanel() {
         right="AZ-104 · 6 WEEKS"
         rightMono
       />
+
+      {/* Cert Progress Strip */}
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 12,
-          padding: "16px 20px",
-          overflow: "auto",
+          padding: "12px 20px",
+          borderBottom: "1px solid var(--border)",
         }}
       >
-        <div>
-          <SectionLabel>Milestones</SectionLabel>
-          <PanelCard>
-            {milestones.map((m, i) => (
-              <MilestoneRow
-                key={m.name}
-                name={m.name}
-                date={m.date}
-                status={m.status}
-                isLast={i === milestones.length - 1}
-              />
-            ))}
-          </PanelCard>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 6,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              color: "var(--text3)",
+            }}
+          >
+            AZ-104 Progress
+          </span>
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              fontFamily: "Syne, sans-serif",
+              color: "var(--teal)",
+            }}
+          >
+            {p.completionPercent}%
+          </span>
         </div>
 
-        <div>
-          <SectionLabel>This Week · Sessions</SectionLabel>
-          <PanelCard>
-            {sessions.map((s, i) => (
-              <SessionRow
-                key={s.day}
-                day={s.day}
-                topic={s.topic}
-                sessionType={s.sessionType}
-                durationMinutes={s.durationMinutes}
-                isToday={s.isToday}
-                isLast={i === sessions.length - 1}
-              />
-            ))}
-          </PanelCard>
+        <div
+          style={{
+            width: "100%",
+            height: 4,
+            background: "var(--border2)",
+            borderRadius: 2,
+            overflow: "hidden",
+            marginBottom: 8,
+          }}
+        >
+          <div
+            style={{
+              width: `${p.completionPercent}%`,
+              height: "100%",
+              background: "linear-gradient(90deg, var(--teal), var(--blue))",
+              borderRadius: 2,
+            }}
+          />
+        </div>
+
+        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+            <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11 }}>
+              <span style={{ color: "var(--teal)" }}>{p.hoursStudied}h</span>
+              <span style={{ color: "var(--text3)" }}> / {p.recommendedHours}h</span>
+            </span>
+            <span style={{ fontSize: 9, color: "var(--text3)" }}>Studied</span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+            <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11 }}>
+              {p.sessionsCompleted}
+            </span>
+            <span style={{ fontSize: 9, color: "var(--text3)" }}>Sessions</span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+            <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11 }}>
+              {p.milestonesCompleted} / {p.milestonesTotal}
+            </span>
+            <span style={{ fontSize: 9, color: "var(--text3)" }}>Milestones</span>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ overflow: "auto", padding: "16px 20px" }}>
+        {clarificationAnswer && (
+          <ClarificationAnswerCard
+            answer={clarificationAnswer}
+            onDismiss={() => setClarification(null)}
+          />
+        )}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 12,
+          }}
+        >
+          <div>
+            <SectionLabel>Milestones</SectionLabel>
+            <PanelCard>
+              {milestones.map((m, i) => (
+                <MilestoneRow
+                  key={m.name}
+                  name={m.name}
+                  date={m.date}
+                  status={m.status}
+                  isLast={i === milestones.length - 1}
+                />
+              ))}
+            </PanelCard>
+          </div>
+
+          <div>
+            <SectionLabel>This Week · Sessions</SectionLabel>
+            <PanelCard>
+              {sessions.map((s, i) => (
+                <SessionRow
+                  key={s.day}
+                  day={s.day}
+                  topic={s.topic}
+                  sessionType={s.sessionType}
+                  durationMinutes={s.durationMinutes}
+                  isToday={s.isToday}
+                  isLast={i === sessions.length - 1}
+                />
+              ))}
+            </PanelCard>
+          </div>
         </div>
       </div>
     </section>
