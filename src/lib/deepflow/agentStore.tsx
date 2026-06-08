@@ -263,6 +263,8 @@ function reducer(state: PipelineState, action: AgentStoreAction): PipelineState 
       return PRESETS[action.preset];
     case "SET_CLARIFICATION":
       return { ...state, clarificationAnswer: action.result };
+    case "SET_CERT_PROGRESS":
+      return { ...state, certProgress: action.progress };
     case "STEP_FORWARD": {
       const order = state.agentOrder;
       const runningIdx = order.findIndex((a) => state.agents[a]?.status === "running");
