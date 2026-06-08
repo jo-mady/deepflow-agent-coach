@@ -364,6 +364,10 @@ export const EMPLOYEE_MOCK_COMPLETION: CompletionCardProps = {
   milestonesTotal: 5,
 };
 
+/* ============================== WEAK TOPICS ============================== */
+
+export const MOCK_WEAK_TOPICS: string[] = ["NSG", "VNet"];
+
 /* ============================== CLARIFICATION ============================== */
 
 export const MOCK_CLARIFICATION: ClarificationAnswer = {
