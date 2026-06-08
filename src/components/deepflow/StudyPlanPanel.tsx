@@ -180,12 +180,16 @@ export function StudyPlanPanel() {
               </>
             ) : (
               <>
-                <PanelHeader
-                  left={isRevising ? "Revision Sessions — Weak Topics Only" : "Study Sessions"}
-                  right={isRevising ? "ATTEMPT 2" : undefined}
-                  rightColor={isRevising ? "var(--coral)" : undefined}
-                  padding="0 0 10px"
-                />
+                {isRevising ? (
+                  <PanelHeader
+                    left="Revision Sessions — Weak Topics Only"
+                    right="ATTEMPT 2"
+                    rightColor="var(--coral)"
+                    padding="0 0 10px"
+                  />
+                ) : (
+                  <SectionLabel>This Week · Sessions</SectionLabel>
+                )}
                 <PanelCard>
                   {visibleSessions.map((s, i) => (
                     <SessionRow
