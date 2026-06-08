@@ -114,6 +114,22 @@ export function DebugPanel() {
           <button onClick={() => setCertProgress(EMPLOYEE_MOCK_PROGRESS)} style={secondaryBtn}>
             Set Progress (22%)
           </button>
+          <button
+            onClick={() => {
+              setPhase("done");
+              setCertProgress({
+                completionPercent: 100,
+                hoursStudied: EMPLOYEE_MOCK_COMPLETION.hoursStudied,
+                recommendedHours: EMPLOYEE_MOCK_PROGRESS.recommendedHours,
+                sessionsCompleted: EMPLOYEE_MOCK_COMPLETION.sessionsCompleted,
+                milestonesCompleted: EMPLOYEE_MOCK_COMPLETION.milestonesCompleted,
+                milestonesTotal: EMPLOYEE_MOCK_COMPLETION.milestonesTotal,
+              });
+            }}
+            style={secondaryBtn}
+          >
+            Trigger DONE phase
+          </button>
 
           <label style={label}>Warnings</label>
           <button onClick={triggerWarn} style={secondaryBtn}>
