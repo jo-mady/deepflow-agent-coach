@@ -107,9 +107,9 @@ export function useSSE(persona: Persona, sessionId: string): UseSSEResult {
       }
 
       advanceAgent(data.agent, {
-        status: data.status === "running" ? "running" : data.status,
+        status: data.status,
         subtitle: data.message,
-        meta: data.status === "running" ? "live" : "done",
+        meta: AGENT_STATUS_META[data.status],
       });
       addTraceEntry({
         time: formatTimestamp(data.timestamp),
