@@ -64,7 +64,7 @@ export function useSSEConnection(): ConnectionState {
  * VITE_API_URL is configured, otherwise returns bundled mock data.
  */
 export function useSSE(persona: Persona, sessionId: string): UseSSEResult {
-  const { advanceAgent, addTraceEntry, setCertProgress } = useAgentStore();
+  const { advanceAgent, addTraceEntry, setCertProgress, setPhase } = useAgentStore();
   const [events, setEvents] = useState<MockSSEEvent[]>([]);
   const [connectionState, setConnectionState] = useState<ConnectionState>(
     API_URL ? "reconnecting" : "mock",
@@ -141,6 +141,15 @@ export function useSSE(persona: Persona, sessionId: string): UseSSEResult {
           milestonesTotal: p.milestone_progress.length,
         });
       }
+
+      if (
+        data.agent === "EmployeeOrchestrator" &&
+        data.status === "done" &&
+        data.payload &&
+        (data.payload.completion_percent === 100 || data.payload.passed === true)
+      ) {
+        setPhase("done");
+      }
     };
 
     es.onerror = () => {
@@ -161,7 +170,7 @@ export function useSSE(persona: Persona, sessionId: string): UseSSEResult {
       es.close();
       esRef.current = null;
     };
-  }, [persona, sessionId, advanceAgent, addTraceEntry, setCertProgress]);
+  }, [persona, sessionId, advanceAgent, addTraceEntry, setCertProgress, setPhase]);
 
   const last = events[events.length - 1];
   return {

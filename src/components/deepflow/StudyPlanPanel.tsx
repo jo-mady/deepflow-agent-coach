@@ -1,10 +1,11 @@
-import { EMPLOYEE_MOCK_MILESTONES, EMPLOYEE_MOCK_SESSIONS } from "@/data/mockData";
+import { EMPLOYEE_MOCK_MILESTONES, EMPLOYEE_MOCK_SESSIONS, EMPLOYEE_MOCK_COMPLETION } from "@/data/mockData";
 import { PanelHeader } from "@/components/ui/PanelHeader";
 import { PanelCard } from "@/components/ui/PanelCard";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { MilestoneRow } from "./MilestoneRow";
 import { SessionRow } from "./SessionRow";
 import { ClarificationAnswerCard } from "./ClarificationAnswerCard";
+import { CompletionCard } from "./CompletionCard";
 import { useAgentStore } from "@/lib/deepflow/agentStore";
 
 /* Adapter: map typed mock data → row view shapes (visuals unchanged). */
@@ -23,7 +24,11 @@ const sessions = EMPLOYEE_MOCK_SESSIONS.map((s) => ({
 }));
 
 export function StudyPlanPanel() {
-  const { clarificationAnswer, setClarification, certProgress } = useAgentStore();
+  const { clarificationAnswer, setClarification, certProgress, currentPhase } = useAgentStore();
+  const isDone = currentPhase === "done";
+  const displayPercent = certProgress
+    ? Math.min(100, isDone ? 100 : certProgress.completionPercent)
+    : 0;
 
   return (
     <section style={{ background: "var(--surface)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
@@ -68,7 +73,7 @@ export function StudyPlanPanel() {
               color: "var(--teal)",
             }}
           >
-            {certProgress.completionPercent}%
+            {displayPercent}%
           </span>
         </div>
 
@@ -84,7 +89,7 @@ export function StudyPlanPanel() {
         >
           <div
             style={{
-              width: `${certProgress.completionPercent}%`,
+              width: `${displayPercent}%`,
               height: "100%",
               background: "linear-gradient(90deg, var(--teal), var(--blue))",
               borderRadius: 2,
@@ -138,7 +143,7 @@ export function StudyPlanPanel() {
                   key={m.name}
                   name={m.name}
                   date={m.date}
-                  status={m.status}
+                  status={isDone ? "done" : m.status}
                   isLast={i === milestones.length - 1}
                 />
               ))}
@@ -146,20 +151,29 @@ export function StudyPlanPanel() {
           </div>
 
           <div>
-            <SectionLabel>This Week · Sessions</SectionLabel>
-            <PanelCard>
-              {sessions.map((s, i) => (
-                <SessionRow
-                  key={s.day}
-                  day={s.day}
-                  topic={s.topic}
-                  sessionType={s.sessionType}
-                  durationMinutes={s.durationMinutes}
-                  isToday={s.isToday}
-                  isLast={i === sessions.length - 1}
-                />
-              ))}
-            </PanelCard>
+            {isDone ? (
+              <>
+                <PanelHeader left="Completion Summary" rightColor="var(--done)" padding="0 0 10px" />
+                <CompletionCard {...EMPLOYEE_MOCK_COMPLETION} />
+              </>
+            ) : (
+              <>
+                <SectionLabel>This Week · Sessions</SectionLabel>
+                <PanelCard>
+                  {sessions.map((s, i) => (
+                    <SessionRow
+                      key={s.day}
+                      day={s.day}
+                      topic={s.topic}
+                      sessionType={s.sessionType}
+                      durationMinutes={s.durationMinutes}
+                      isToday={s.isToday}
+                      isLast={i === sessions.length - 1}
+                    />
+                  ))}
+                </PanelCard>
+              </>
+            )}
           </div>
         </div>
       </div>

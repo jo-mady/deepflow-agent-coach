@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ALL_PHASES, useAgentStore, type Phase, type Preset } from "@/lib/deepflow/agentStore";
-import { MOCK_CLARIFICATION, EMPLOYEE_MOCK_PROGRESS } from "@/data/mockData";
+import { MOCK_CLARIFICATION, EMPLOYEE_MOCK_PROGRESS, EMPLOYEE_MOCK_COMPLETION } from "@/data/mockData";
 
 const PHASE_LABEL: Record<Phase, string> = {
   profile: "Profile",
@@ -8,6 +8,7 @@ const PHASE_LABEL: Record<Phase, string> = {
   plan: "Plan",
   confirm: "Confirm",
   assess: "Assess",
+  done: "Done",
 };
 
 export function DebugPanel() {
@@ -112,6 +113,22 @@ export function DebugPanel() {
           <label style={label}>Progress</label>
           <button onClick={() => setCertProgress(EMPLOYEE_MOCK_PROGRESS)} style={secondaryBtn}>
             Set Progress (22%)
+          </button>
+          <button
+            onClick={() => {
+              setPhase("done");
+              setCertProgress({
+                completionPercent: 100,
+                hoursStudied: EMPLOYEE_MOCK_COMPLETION.hoursStudied,
+                recommendedHours: EMPLOYEE_MOCK_PROGRESS.recommendedHours,
+                sessionsCompleted: EMPLOYEE_MOCK_COMPLETION.sessionsCompleted,
+                milestonesCompleted: EMPLOYEE_MOCK_COMPLETION.milestonesCompleted,
+                milestonesTotal: EMPLOYEE_MOCK_COMPLETION.milestonesTotal,
+              });
+            }}
+            style={secondaryBtn}
+          >
+            Trigger DONE phase
           </button>
 
           <label style={label}>Warnings</label>

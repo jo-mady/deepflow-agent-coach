@@ -4,6 +4,7 @@
  * visual output is unchanged when components migrate to consume from here.
  */
 import { colorForAgent } from "@/constants";
+import type { CompletionCardProps } from "@/components/deepflow/CompletionCard";
 import type {
   AgentNodeData,
   AssessmentState,
@@ -352,6 +353,14 @@ export const EMPLOYEE_MOCK_PROGRESS: CertProgress = {
   recommendedHours: 40,
   sessionsCompleted: 7,
   milestonesCompleted: 1,
+  milestonesTotal: 5,
+};
+
+export const EMPLOYEE_MOCK_COMPLETION: CompletionCardProps = {
+  certId: "AZ-104",
+  hoursStudied: 38.5,
+  sessionsCompleted: 31,
+  milestonesCompleted: 5,
   milestonesTotal: 5,
 };
 
