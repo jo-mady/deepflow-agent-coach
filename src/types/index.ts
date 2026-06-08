@@ -108,6 +108,9 @@ export interface PipelineState {
 
   // Cert progress
   certProgress: CertProgress | null;
+
+  // Revising
+  weakTopics: string[];
 }
 
 export type AgentStoreAction =
@@ -119,7 +122,8 @@ export type AgentStoreAction =
   | { type: "LOAD_PRESET"; preset: "employee" | "assessment" | "manager" }
   | { type: "STEP_FORWARD" }
   | { type: "SET_CLARIFICATION"; result: ClarificationAnswer | null }
-  | { type: "SET_CERT_PROGRESS"; progress: CertProgress };
+  | { type: "SET_CERT_PROGRESS"; progress: CertProgress }
+  | { type: "SET_WEAK_TOPICS"; topics: string[] };
 
 /* ============================== EMPLOYEE DOMAIN ============================== */
 
