@@ -141,6 +141,15 @@ export function useSSE(persona: Persona, sessionId: string): UseSSEResult {
           milestonesTotal: p.milestone_progress.length,
         });
       }
+
+      if (
+        data.agent === "EmployeeOrchestrator" &&
+        data.status === "done" &&
+        data.payload &&
+        (data.payload.completion_percent === 100 || data.payload.passed === true)
+      ) {
+        setPhase("done");
+      }
     };
 
     es.onerror = () => {
