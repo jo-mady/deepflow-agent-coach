@@ -32,9 +32,12 @@ export function PipelinePanel() {
 
   const NODES: NodeDef[] = clarificationAnswer
     ? [
-        ...BASE_NODES.slice(0, 4),
-        CLARIFICATION_NODE,
-        ...BASE_NODES.slice(4),
+        BASE_NODES[0],
+        BASE_NODES[1],
+        BASE_NODES[2],
+        { ...BASE_NODES[3], connector: "→ question detected" },
+        { ...CLARIFICATION_NODE, connector: "→ plan → CalendarAgent" },
+        BASE_NODES[4],
       ]
     : BASE_NODES;
 
