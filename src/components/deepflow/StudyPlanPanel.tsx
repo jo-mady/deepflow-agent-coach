@@ -2,6 +2,7 @@ import { EMPLOYEE_MOCK_MILESTONES, EMPLOYEE_MOCK_SESSIONS, EMPLOYEE_MOCK_COMPLET
 import { PanelHeader } from "@/components/ui/PanelHeader";
 import { PanelCard } from "@/components/ui/PanelCard";
 import { SectionLabel } from "@/components/ui/SectionLabel";
+import { Tag } from "@/components/ui/Tag";
 import { MilestoneRow } from "./MilestoneRow";
 import { SessionRow } from "./SessionRow";
 import { ClarificationAnswerCard } from "./ClarificationAnswerCard";
@@ -24,11 +25,19 @@ const sessions = EMPLOYEE_MOCK_SESSIONS.map((s) => ({
 }));
 
 export function StudyPlanPanel() {
-  const { clarificationAnswer, setClarification, certProgress, currentPhase } = useAgentStore();
+  const { clarificationAnswer, setClarification, certProgress, currentPhase, weakTopics } = useAgentStore();
   const isDone = currentPhase === "done";
+  const isRevising = currentPhase === "revising";
   const displayPercent = certProgress
     ? Math.min(100, isDone ? 100 : certProgress.completionPercent)
     : 0;
+
+  const matchesWeak = (text: string): boolean =>
+    weakTopics.some((t) => text.toLowerCase().includes(t.toLowerCase()));
+  const visibleSessions =
+    isRevising && weakTopics.length > 0 ? sessions.filter((s) => matchesWeak(s.topic)) : sessions;
+  const isMilestoneWeak = (milestoneName: string): boolean =>
+    isRevising && matchesWeak(milestoneName);
 
   return (
     <section style={{ background: "var(--surface)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
@@ -37,6 +46,11 @@ export function StudyPlanPanel() {
         right="AZ-104 · 6 WEEKS"
         rightMono
       />
+      {isRevising && (
+        <div style={{ padding: "8px 20px", borderBottom: "1px solid var(--border)" }}>
+          <Tag label="⟳ Revising" color="var(--amber)" bg="var(--amber-dim)" />
+        </div>
+      )}
 
       {/* Cert Progress Strip */}
       {certProgress && (
@@ -138,15 +152,23 @@ export function StudyPlanPanel() {
           <div>
             <SectionLabel>Milestones</SectionLabel>
             <PanelCard>
-              {milestones.map((m, i) => (
-                <MilestoneRow
-                  key={m.name}
-                  name={m.name}
-                  date={m.date}
-                  status={isDone ? "done" : m.status}
-                  isLast={i === milestones.length - 1}
-                />
-              ))}
+              {milestones.map((m, i) => {
+                const row = (
+                  <MilestoneRow
+                    name={m.name}
+                    date={m.date}
+                    status={isDone ? "done" : m.status}
+                    isLast={i === milestones.length - 1}
+                  />
+                );
+                return isMilestoneWeak(m.name) ? (
+                  <div key={m.name} style={{ borderLeft: "2px solid var(--coral)", paddingLeft: 6 }}>
+                    {row}
+                  </div>
+                ) : (
+                  <div key={m.name}>{row}</div>
+                );
+              })}
             </PanelCard>
           </div>
 
@@ -158,9 +180,18 @@ export function StudyPlanPanel() {
               </>
             ) : (
               <>
-                <SectionLabel>This Week · Sessions</SectionLabel>
+                {isRevising ? (
+                  <PanelHeader
+                    left="Revision Sessions — Weak Topics Only"
+                    right="ATTEMPT 2"
+                    rightColor="var(--coral)"
+                    padding="0 0 10px"
+                  />
+                ) : (
+                  <SectionLabel>This Week · Sessions</SectionLabel>
+                )}
                 <PanelCard>
-                  {sessions.map((s, i) => (
+                  {visibleSessions.map((s, i) => (
                     <SessionRow
                       key={s.day}
                       day={s.day}
@@ -168,13 +199,14 @@ export function StudyPlanPanel() {
                       sessionType={s.sessionType}
                       durationMinutes={s.durationMinutes}
                       isToday={s.isToday}
-                      isLast={i === sessions.length - 1}
+                      isLast={i === visibleSessions.length - 1}
                     />
                   ))}
                 </PanelCard>
               </>
             )}
           </div>
+
         </div>
       </div>
     </section>

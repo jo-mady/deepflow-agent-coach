@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ALL_PHASES, useAgentStore, type Phase, type Preset } from "@/lib/deepflow/agentStore";
-import { MOCK_CLARIFICATION, EMPLOYEE_MOCK_PROGRESS, EMPLOYEE_MOCK_COMPLETION } from "@/data/mockData";
+import { MOCK_CLARIFICATION, EMPLOYEE_MOCK_PROGRESS, EMPLOYEE_MOCK_COMPLETION, MOCK_WEAK_TOPICS } from "@/data/mockData";
 
 const PHASE_LABEL: Record<Phase, string> = {
   profile: "Profile",
@@ -8,12 +8,13 @@ const PHASE_LABEL: Record<Phase, string> = {
   plan: "Plan",
   confirm: "Confirm",
   assess: "Assess",
+  revising: "Revising",
   done: "Done",
 };
 
 export function DebugPanel() {
   const [open, setOpen] = useState(false);
-  const { currentPhase, setPhase, stepForward, resetPipeline, loadPreset, setClarification, setCertProgress, advanceAgent, addTraceEntry } = useAgentStore();
+  const { currentPhase, setPhase, stepForward, resetPipeline, loadPreset, setClarification, setCertProgress, setWeakTopics, advanceAgent, addTraceEntry } = useAgentStore();
 
   const triggerWarn = () => {
     const message =
@@ -130,6 +131,16 @@ export function DebugPanel() {
           >
             Trigger DONE phase
           </button>
+          <button
+            onClick={() => {
+              setWeakTopics(MOCK_WEAK_TOPICS);
+              setPhase("revising");
+            }}
+            style={secondaryBtn}
+          >
+            Trigger REVISING
+          </button>
+
 
           <label style={label}>Warnings</label>
           <button onClick={triggerWarn} style={secondaryBtn}>

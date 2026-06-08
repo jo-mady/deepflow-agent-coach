@@ -64,7 +64,7 @@ export function useSSEConnection(): ConnectionState {
  * VITE_API_URL is configured, otherwise returns bundled mock data.
  */
 export function useSSE(persona: Persona, sessionId: string): UseSSEResult {
-  const { advanceAgent, addTraceEntry, setCertProgress, setPhase } = useAgentStore();
+  const { advanceAgent, addTraceEntry, setCertProgress, setPhase, setWeakTopics } = useAgentStore();
   const [events, setEvents] = useState<MockSSEEvent[]>([]);
   const [connectionState, setConnectionState] = useState<ConnectionState>(
     API_URL ? "reconnecting" : "mock",
@@ -150,6 +150,17 @@ export function useSSE(persona: Persona, sessionId: string): UseSSEResult {
       ) {
         setPhase("done");
       }
+
+      if (data.agent === "AssessmentAgent" && data.status === "done" && data.payload) {
+        const passed = data.payload.passed === true;
+        const weakTopics = Array.isArray(data.payload.weak_topics)
+          ? (data.payload.weak_topics as string[])
+          : [];
+        if (!passed && weakTopics.length > 0) {
+          setWeakTopics(weakTopics);
+          setPhase("revising");
+        }
+      }
     };
 
     es.onerror = () => {
@@ -170,7 +181,7 @@ export function useSSE(persona: Persona, sessionId: string): UseSSEResult {
       es.close();
       esRef.current = null;
     };
-  }, [persona, sessionId, advanceAgent, addTraceEntry, setCertProgress, setPhase]);
+  }, [persona, sessionId, advanceAgent, addTraceEntry, setCertProgress, setPhase, setWeakTopics]);
 
   const last = events[events.length - 1];
   return {

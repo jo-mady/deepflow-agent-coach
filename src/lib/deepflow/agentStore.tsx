@@ -140,6 +140,7 @@ const employeeInitial: PipelineState = {
   teamStats: { atRisk: 3, onTrack: 2, notStarted: 3, teamAvg: 68 },
   clarificationAnswer: null,
   certProgress: null,
+  weakTopics: [],
 };
 
 const assessmentInitial: PipelineState = {
@@ -265,6 +266,8 @@ function reducer(state: PipelineState, action: AgentStoreAction): PipelineState 
       return { ...state, clarificationAnswer: action.result };
     case "SET_CERT_PROGRESS":
       return { ...state, certProgress: action.progress };
+    case "SET_WEAK_TOPICS":
+      return { ...state, weakTopics: action.topics };
     case "STEP_FORWARD": {
       const order = state.agentOrder;
       const runningIdx = order.findIndex((a) => state.agents[a]?.status === "running");
@@ -308,6 +311,7 @@ interface StoreApi extends PipelineState {
   stepForward: () => void;
   setClarification: (result: ClarificationAnswer | null) => void;
   setCertProgress: (progress: CertProgress) => void;
+  setWeakTopics: (topics: string[]) => void;
 }
 
 const AgentContext = createContext<StoreApi | null>(null);
@@ -348,6 +352,10 @@ export function AgentProvider({ children }: { children: ReactNode }) {
     (progress: CertProgress) => dispatch({ type: "SET_CERT_PROGRESS", progress }),
     [],
   );
+  const setWeakTopics = useCallback(
+    (topics: string[]) => dispatch({ type: "SET_WEAK_TOPICS", topics }),
+    [],
+  );
 
   const value = useMemo<StoreApi>(
     () => ({
@@ -361,6 +369,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
       stepForward,
       setClarification,
       setCertProgress,
+      setWeakTopics,
     }),
     [
       state,
@@ -373,6 +382,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
       stepForward,
       setClarification,
       setCertProgress,
+      setWeakTopics,
     ],
   );
 
