@@ -113,6 +113,11 @@ export function DebugPanel() {
           <button onClick={() => setCertProgress(EMPLOYEE_MOCK_PROGRESS)} style={secondaryBtn}>
             Set Progress (22%)
           </button>
+
+          <label style={label}>Warnings</label>
+          <button onClick={triggerWarn} style={secondaryBtn}>
+            Trigger warn (PathCurator)
+          </button>
         </div>
       )}
 
