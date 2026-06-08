@@ -30,7 +30,7 @@ export type AgentStatus =
 
 export type Persona = "employee" | "manager";
 
-export type EmployeePhase = "profile" | "curate" | "plan" | "confirm" | "assess";
+export type EmployeePhase = "profile" | "curate" | "plan" | "confirm" | "assess" | "done";
 export type ManagerPhase =
   | "analysing"
   | "reporting"
