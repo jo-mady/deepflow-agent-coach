@@ -334,6 +334,11 @@ export function AgentProvider({ children }: { children: ReactNode }) {
     [],
   );
   const stepForward = useCallback(() => dispatch({ type: "STEP_FORWARD" }), []);
+  const setClarification = useCallback(
+    (result: ClarificationAnswer | null) =>
+      dispatch({ type: "SET_CLARIFICATION", result }),
+    [],
+  );
 
   const value = useMemo<StoreApi>(
     () => ({
@@ -345,6 +350,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
       resetPipeline,
       loadPreset,
       stepForward,
+      setClarification,
     }),
     [
       state,
@@ -355,6 +361,7 @@ export function AgentProvider({ children }: { children: ReactNode }) {
       resetPipeline,
       loadPreset,
       stepForward,
+      setClarification,
     ],
   );
 
