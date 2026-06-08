@@ -7,6 +7,8 @@ import { colorForAgent } from "@/constants";
 import type {
   AgentNodeData,
   AssessmentState,
+  CertProgress,
+  ClarificationAnswer,
   CognitiveLoad,
   ManagerInsightStepData,
   Milestone,
