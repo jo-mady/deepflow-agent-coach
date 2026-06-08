@@ -311,6 +311,7 @@ interface StoreApi extends PipelineState {
   stepForward: () => void;
   setClarification: (result: ClarificationAnswer | null) => void;
   setCertProgress: (progress: CertProgress) => void;
+  setWeakTopics: (topics: string[]) => void;
 }
 
 const AgentContext = createContext<StoreApi | null>(null);
