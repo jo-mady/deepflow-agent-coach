@@ -68,7 +68,7 @@ export function StudyPlanPanel() {
               color: "var(--teal)",
             }}
           >
-            {p.completionPercent}%
+            {certProgress.completionPercent}%
           </span>
         </div>
 
