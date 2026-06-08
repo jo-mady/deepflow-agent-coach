@@ -12,7 +12,24 @@ const PHASE_LABEL: Record<Phase, string> = {
 
 export function DebugPanel() {
   const [open, setOpen] = useState(false);
-  const { currentPhase, setPhase, stepForward, resetPipeline, loadPreset, setClarification, setCertProgress } = useAgentStore();
+  const { currentPhase, setPhase, stepForward, resetPipeline, loadPreset, setClarification, setCertProgress, advanceAgent, addTraceEntry } = useAgentStore();
+
+  const triggerWarn = () => {
+    const message =
+      "Your role (Cloud Engineer) typically requires AZ-104, but you selected AZ-900. Confirm to continue, or switch?";
+    advanceAgent("PathCuratorAgent", {
+      status: "warn",
+      subtitle: message,
+      meta: "warn",
+    });
+    addTraceEntry({
+      time: "demo",
+      agent: "PathCuratorAgent",
+      agentColor: "var(--amber)",
+      message,
+      isActive: false,
+    });
+  };
 
 
   return (
@@ -95,6 +112,11 @@ export function DebugPanel() {
           <label style={label}>Progress</label>
           <button onClick={() => setCertProgress(EMPLOYEE_MOCK_PROGRESS)} style={secondaryBtn}>
             Set Progress (22%)
+          </button>
+
+          <label style={label}>Warnings</label>
+          <button onClick={triggerWarn} style={secondaryBtn}>
+            Trigger warn (PathCurator)
           </button>
         </div>
       )}

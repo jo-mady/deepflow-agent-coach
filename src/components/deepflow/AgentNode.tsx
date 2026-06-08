@@ -1,6 +1,8 @@
 import type { CSSProperties } from "react";
+import { AGENT_STATUS_META } from "@/constants";
+import type { AgentStatus } from "@/types";
 
-export type NodeState = "done" | "active" | "waiting";
+export type NodeState = "done" | "active" | "waiting" | "warn" | "blocked" | "error";
 
 export interface AgentNodeProps {
   name: string;
@@ -21,12 +23,28 @@ const dotStyle = (state: NodeState): CSSProperties => {
   };
   if (state === "done") return { ...base, background: "var(--done)" };
   if (state === "active") return { ...base, background: "var(--teal)" };
+  if (state === "warn") return { ...base, background: "var(--amber)" };
+  if (state === "blocked" || state === "error") return { ...base, background: "var(--coral)" };
   return { ...base, background: "var(--slate)" };
+};
+
+const STATUS_TO_META: Partial<Record<NodeState, string>> = {
+  warn: AGENT_STATUS_META.warn,
+  blocked: AGENT_STATUS_META.blocked,
+  error: AGENT_STATUS_META.error,
 };
 
 export function AgentNode({ name, subtitle, state, meta, metaLive, badge }: AgentNodeProps) {
   const nameColor =
-    state === "done" ? "var(--done)" : state === "active" ? "var(--teal)" : "var(--text2)";
+    state === "done"
+      ? "var(--done)"
+      : state === "active"
+        ? "var(--teal)"
+        : state === "warn"
+          ? "var(--amber)"
+          : state === "blocked" || state === "error"
+            ? "var(--coral)"
+            : "var(--text2)";
 
   const cardStyle: CSSProperties = {
     position: "relative",
@@ -42,16 +60,33 @@ export function AgentNode({ name, subtitle, state, meta, metaLive, badge }: Agen
     cardStyle.borderColor = "var(--teal)";
     cardStyle.background = "var(--teal-dim)";
     cardStyle.boxShadow = "0 0 16px var(--teal-mid)";
+  } else if (state === "warn") {
+    cardStyle.borderColor = "var(--amber)";
+    cardStyle.background = "var(--amber-dim)";
+  } else if (state === "blocked" || state === "error") {
+    cardStyle.borderColor = "var(--coral)";
+    cardStyle.background = "var(--coral-dim)";
   } else {
     cardStyle.borderColor = "var(--border2)";
     cardStyle.background = "transparent";
     cardStyle.opacity = 0.35;
   }
 
+  const resolvedMeta = STATUS_TO_META[state] ?? meta;
+  const metaColor =
+    state === "warn"
+      ? "var(--amber)"
+      : state === "blocked" || state === "error"
+        ? "var(--coral)"
+        : metaLive
+          ? "var(--teal)"
+          : "var(--text3)";
+  const showPulse = state === "active";
+
   return (
     <div style={cardStyle}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span className={state === "active" ? "df-pulse" : ""} style={dotStyle(state)} />
+        <span className={showPulse ? "df-pulse" : ""} style={dotStyle(state)} />
         <span
           style={{
             fontSize: 12,
@@ -87,24 +122,27 @@ export function AgentNode({ name, subtitle, state, meta, metaLive, badge }: Agen
       >
         {subtitle}
       </div>
-      {meta && (
+      {resolvedMeta && (
         <div
-          className={metaLive ? "df-pulse" : ""}
+          className={metaLive && state === "active" ? "df-pulse" : ""}
           style={{
             position: "absolute",
             top: 12,
             right: 14,
             fontFamily: "JetBrains Mono, monospace",
             fontSize: 9,
-            color: metaLive ? "var(--teal)" : "var(--text3)",
+            color: metaColor,
           }}
         >
-          {meta}
+          {resolvedMeta}
         </div>
       )}
     </div>
   );
 }
+
+// Re-export AgentStatus for downstream consumers that need it alongside NodeState.
+export type { AgentStatus };
 
 export function Connector({ label }: { label: string }) {
   return (
