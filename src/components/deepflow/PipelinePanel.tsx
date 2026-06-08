@@ -59,7 +59,15 @@ export function PipelinePanel() {
 
       <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column" }}>
         {NODES.map((n, i) => {
-          const s = agents[n.agent];
+          const s =
+            n.agent === "ClarificationAgent"
+              ? {
+                  status: "done" as const,
+                  subtitle: "Foundry IQ + web · answer ready",
+                  meta: "done",
+                  reasoning: "",
+                }
+              : agents[n.agent];
           if (!s) return null;
           const visualState =
             s.status === "done" ? "done" : s.status === "running" ? "active" : "waiting";
