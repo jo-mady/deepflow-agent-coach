@@ -46,6 +46,11 @@ export function StudyPlanPanel() {
         right="AZ-104 · 6 WEEKS"
         rightMono
       />
+      {isRevising && (
+        <div style={{ padding: "8px 20px", borderBottom: "1px solid var(--border)" }}>
+          <Tag label="⟳ Revising" color="var(--amber)" bg="var(--amber-dim)" />
+        </div>
+      )}
 
       {/* Cert Progress Strip */}
       {certProgress && (
